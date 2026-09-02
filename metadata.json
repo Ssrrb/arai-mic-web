@@ -1,0 +1,7 @@
+{
+  "name": "TUKU - Balones de Alto Rendimiento",
+  "description": "Experiencia 3D interactiva de TUKU: Balones deportivos de alta ingeniería y precisión.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
