@@ -1,6 +1,6 @@
 {
-  "name": "TUKU - Balones de Alto Rendimiento",
-  "description": "Experiencia 3D interactiva de TUKU: Balones deportivos de alta ingeniería y precisión.",
+  "name": "SLAM DUNK - Official 29.5\" Basketball Equipment",
+  "description": "Interactive 3D showcase and store for SLAM DUNK official 29.5\" basketball editions.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
