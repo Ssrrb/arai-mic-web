@@ -77,15 +77,51 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
   const totalCartItems = cart.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+  const [isShooting, setIsShooting] = useState(false);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 2800);
+    setTimeout(() => setToastMessage(null), 3200);
   };
 
+  // Listen for 3D ball landed event to celebrate swish with net snap and sound
+  useEffect(() => {
+    const handleBallLanded = (e: Event) => {
+      const customEvent = e as CustomEvent<{ edition: BallEdition }>;
+      const landedEdition = customEvent.detail?.edition || edition;
+      const itemData = EDITIONS_LIST.find((item) => item.id === landedEdition) || EDITIONS_LIST[0];
+
+      showToast(`🏀 ¡SWISH! ${itemData.bgText} encestado en el carrito`);
+
+      // Punch cart count badge with GSAP
+      const badge = document.getElementById('cart-count-badge');
+      if (badge) {
+        gsap.killTweensOf(badge);
+        gsap.fromTo(
+          badge,
+          { scale: 2.2, backgroundColor: '#ffffff', color: '#000000' },
+          {
+            scale: 1.0,
+            backgroundColor: '#00c2ff',
+            color: '#09090b',
+            duration: 0.5,
+            ease: 'back.out(3.5)',
+          }
+        );
+      }
+    };
+
+    window.addEventListener('slam-dunk:ball-landed', handleBallLanded);
+    return () => {
+      window.removeEventListener('slam-dunk:ball-landed', handleBallLanded);
+    };
+  }, [edition]);
+
   const addToCart = (edId: BallEdition) => {
-    const itemData = EDITIONS_LIST.find((e) => e.id === edId) || EDITIONS_LIST[0];
+    const itemData = EDITIONS_LIST.find((item) => item.id === edId) || EDITIONS_LIST[0];
     const itemId = edId;
 
+    // Immediately add item to cart state for instant responsiveness
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item.id === itemId);
       if (existing) {
@@ -106,7 +142,28 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
       ];
     });
 
-    showToast(`Añadido al carrito: ${itemData.bgText} ${itemData.name} ($${itemData.price.toFixed(2)})`);
+    showToast(`🏀 ${itemData.bgText} añadido al carrito ($${itemData.price.toFixed(2)})`);
+
+    // 1. GSAP button tactile press & spring bounce
+    const activeBtn = document.activeElement as HTMLElement | null;
+    if (activeBtn && activeBtn.tagName === 'BUTTON') {
+      gsap.killTweensOf(activeBtn);
+      gsap.timeline()
+        .to(activeBtn, { scale: 0.92, duration: 0.08, ease: 'power2.in' })
+        .to(activeBtn, { scale: 1.05, duration: 0.16, ease: 'back.out(2.2)' })
+        .to(activeBtn, { scale: 1.0, duration: 0.12 });
+    }
+
+    // 2. Set shooting state for interactive visual feedback on the button
+    setIsShooting(true);
+    setTimeout(() => setIsShooting(false), 900);
+
+    // 3. Dispatch GSAP 3D ball throw into the cart
+    window.dispatchEvent(
+      new CustomEvent('slam-dunk:throw-ball', {
+        detail: { edition: edId },
+      })
+    );
   };
 
   const updateQuantity = (id: string, delta: number) => {
@@ -241,7 +298,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           >
             <ShoppingBag className="w-5 h-5" />
             {totalCartItems > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#00c2ff] text-zinc-950 text-[10px] font-black flex items-center justify-center animate-scale">
+              <span
+                id="cart-count-badge"
+                className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#00c2ff] text-zinc-950 text-[10px] font-black flex items-center justify-center animate-scale"
+              >
                 {totalCartItems}
               </span>
             )}
@@ -290,7 +350,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
       )}
 
       {/* Hero Section - Matching the Reference Design with Adaptive Responsiveness */}
-      <section className="min-h-[100dvh] w-full relative flex flex-col justify-between px-4 sm:px-8 md:px-12 pt-24 sm:pt-28 pb-6 sm:pb-8 pointer-events-none">
+      <section className="min-h-[100dvh] w-full relative flex flex-col justify-between px-4 sm:px-8 md:px-12 pt-24 sm:pt-28 pb-6 sm:pb-8">
         {/* Top-Left: Promotion Video Button */}
         <div className="w-full flex justify-between items-start">
           <div className="pointer-events-auto flex items-center gap-2.5 sm:gap-3">
@@ -356,9 +416,17 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
               <button
                 id="hero-add-to-cart-btn"
                 onClick={() => addToCart(edition)}
-                className="px-12 lg:px-16 py-3.5 lg:py-4 bg-[#00c2ff] hover:bg-[#38bdf8] active:scale-95 text-black font-black text-xs lg:text-sm tracking-widest uppercase rounded-md shadow-2xl shadow-[#00c2ff]/40 transition-all cursor-pointer whitespace-nowrap"
+                disabled={isShooting}
+                className="px-12 lg:px-16 py-3.5 lg:py-4 bg-[#00c2ff] hover:bg-[#38bdf8] active:scale-95 text-black font-black text-xs lg:text-sm tracking-widest uppercase rounded-md shadow-2xl shadow-[#00c2ff]/40 transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
               >
-                ADD TO CART
+                {isShooting ? (
+                  <>
+                    <Sparkles className="w-4 h-4 animate-spin text-black" />
+                    <span>¡LANZANDO AL ARO! 🏀</span>
+                  </>
+                ) : (
+                  <span>ADD TO CART</span>
+                )}
               </button>
             </div>
 
@@ -399,9 +467,17 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
             <button
               id="mobile-hero-add-to-cart-btn"
               onClick={() => addToCart(edition)}
-              className="w-full py-4 bg-[#00c2ff] hover:bg-[#38bdf8] active:scale-[0.98] text-black font-black text-xs tracking-widest uppercase rounded-lg shadow-xl shadow-[#00c2ff]/35 transition-all cursor-pointer text-center"
+              disabled={isShooting}
+              className="w-full py-4 bg-[#00c2ff] hover:bg-[#38bdf8] active:scale-[0.98] text-black font-black text-xs tracking-widest uppercase rounded-lg shadow-xl shadow-[#00c2ff]/35 transition-all cursor-pointer text-center flex items-center justify-center gap-2"
             >
-              ADD TO CART
+              {isShooting ? (
+                <>
+                  <Sparkles className="w-4 h-4 animate-spin text-black" />
+                  <span>¡LANZANDO AL ARO! 🏀</span>
+                </>
+              ) : (
+                <span>ADD TO CART</span>
+              )}
             </button>
           </div>
         </div>
@@ -484,11 +560,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
             id="add-cart-perf-btn"
             onClick={() => {
               addToCart(edition);
-              setIsCartOpen(true);
             }}
             className="flex items-center gap-2 text-[#ff5722] font-bold text-xs uppercase tracking-wider hover:text-white transition-colors cursor-pointer justify-end w-full"
           >
-            Comprar Ahora <ArrowRight className="w-4 h-4" />
+            Comprar y Lanzar al Carrito <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </section>
@@ -581,7 +656,6 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
             id="cta-add-to-cart-btn"
             onClick={() => {
               addToCart(edition);
-              setIsCartOpen(true);
             }}
             className="px-8 py-3.5 bg-[#ff5000] text-white rounded-[2px] text-sm font-black uppercase tracking-widest hover:bg-white hover:text-zinc-950 active:scale-95 transition-all shadow-2xl shadow-[#ff5000]/30 cursor-pointer inline-flex items-center gap-2"
           >

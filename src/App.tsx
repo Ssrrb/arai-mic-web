@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { CanvasContainer } from './components/CanvasContainer';
 import { Overlay } from './components/Overlay';
 import { BackgroundTypography } from './components/BackgroundTypography';
+import { CartSwishEffects } from './components/CartSwishEffects';
 import { BallEdition } from './components/Basketball';
 import { EDITIONS_LIST } from './data/editions';
 
@@ -30,7 +31,11 @@ export default function App() {
 
         {/* Foreground UI controls, overlays and sections */}
         <Overlay edition={edition} onSelectEdition={setEdition} />
+
+        {/* Celebratory GSAP Cart Swish Net & Shockwave Effects */}
+        <CartSwishEffects />
       </main>
     </div>
   );
 }
+
