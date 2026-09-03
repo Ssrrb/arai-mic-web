@@ -3,20 +3,23 @@ import { Group } from 'three';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { Basketball, BallEdition } from './Basketball';
+import { CustomBallConfig } from '../types';
 
 interface ProjectileBallProps {
   id: number;
-  edition: BallEdition;
+  edition: BallEdition | 'custom';
+  customConfig?: CustomBallConfig;
   startPos: THREE.Vector3;
   controlPos: THREE.Vector3;
   targetPos: THREE.Vector3;
   baseScale: number;
-  onLanded: (id: number, edition: BallEdition) => void;
+  onLanded: (id: number, edition: BallEdition | 'custom') => void;
 }
 
 export function ProjectileBall({
   id,
   edition,
+  customConfig,
   startPos,
   controlPos,
   targetPos,
@@ -31,7 +34,8 @@ export function ProjectileBall({
 
   // Edition accent color
   let trailColor = '#00c2ff';
-  if (edition === 'fuego') trailColor = '#ff5722';
+  if (edition === 'custom') trailColor = customConfig?.baseColor || '#ff5722';
+  else if (edition === 'fuego') trailColor = '#ff5722';
   else if (edition === 'oro') trailColor = '#f59e0b';
   else if (edition === 'metal') trailColor = '#cbd5e1';
 
@@ -135,7 +139,12 @@ export function ProjectileBall({
   return (
     <group ref={groupRef}>
       {/* 3D Flying Basketball */}
-      <Basketball edition={edition} scale={1} autoRotate={false} />
+      <Basketball
+        edition={edition === 'custom' ? 'fuego' : edition}
+        customConfig={customConfig}
+        scale={1}
+        autoRotate={false}
+      />
 
       {/* Trailing Comet Particles */}
       <group ref={trailGroupRef}>

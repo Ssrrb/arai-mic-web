@@ -1,4 +1,4 @@
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Environment, Float, Lightformer, ContactShadows } from '@react-three/drei';
 import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
 import { Basketball, BallEdition } from './Basketball';
@@ -6,12 +6,14 @@ import { ProjectileBall } from './ProjectileBall';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
+import { CustomBallConfig, AppView } from '../types';
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface ActiveProjectile {
   id: number;
-  edition: BallEdition;
+  edition: BallEdition | 'custom';
+  customConfig?: CustomBallConfig;
   startPos: THREE.Vector3;
   controlPos: THREE.Vector3;
   targetPos: THREE.Vector3;
@@ -20,15 +22,30 @@ interface ActiveProjectile {
 
 interface SceneControllerProps {
   edition: BallEdition;
+  viewMode: AppView;
+  customConfig: CustomBallConfig;
+  autoRotate: boolean;
 }
 
-function SceneController({ edition }: SceneControllerProps) {
+function SceneController({
+  edition,
+  viewMode,
+  customConfig,
+  autoRotate,
+}: SceneControllerProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const rotGroupRef = useRef<THREE.Group>(null);
   const mainBallWrapperRef = useRef<THREE.Group>(null);
   const mainBallInnerRef = useRef<THREE.Group>(null);
 
   const [projectiles, setProjectiles] = useState<ActiveProjectile[]>([]);
   const isRespawningRef = useRef(false);
+
+  // Drag rotation state
+  const isDraggingRef = useRef(false);
+  const prevPointerRef = useRef({ x: 0, y: 0 });
+  const rotVelocityRef = useRef({ x: 0, y: 0 });
+  const userRotRef = useRef({ x: 0.1, y: 0.35 });
 
   const { size, camera } = useThree();
 
@@ -37,15 +54,47 @@ function SceneController({ edition }: SceneControllerProps) {
 
   // Responsive scale tailored to viewport
   let responsiveScale = 1.18;
-  if (isMobile) {
-    responsiveScale = 0.78;
-  } else if (isTablet) {
-    responsiveScale = 0.96;
+  if (viewMode === 'customizer') {
+    responsiveScale = isMobile ? 0.92 : isTablet ? 1.08 : 1.32;
   } else {
-    responsiveScale = 1.18;
+    responsiveScale = isMobile ? 0.78 : isTablet ? 0.96 : 1.18;
   }
 
-  const initialY = isMobile ? 0.98 : 0;
+  const landingInitialY = isMobile ? 0.98 : 0;
+  const customizerTargetPos = isMobile
+    ? new THREE.Vector3(0, 1.15, 0)
+    : isTablet
+    ? new THREE.Vector3(1.05, 0, 0.1)
+    : new THREE.Vector3(1.42, -0.05, 0.15);
+
+  // Frame loop: smooth physics damping for interactive drag rotation & gentle auto-rotation
+  useFrame((_, delta) => {
+    if (!rotGroupRef.current) return;
+
+    if (viewMode === 'customizer') {
+      if (isDraggingRef.current) {
+        userRotRef.current.y += rotVelocityRef.current.y;
+        userRotRef.current.x += rotVelocityRef.current.x;
+        rotVelocityRef.current.x *= 0.88;
+        rotVelocityRef.current.y *= 0.88;
+      } else {
+        userRotRef.current.y += rotVelocityRef.current.y;
+        userRotRef.current.x += rotVelocityRef.current.x;
+        rotVelocityRef.current.x *= 0.92;
+        rotVelocityRef.current.y *= 0.92;
+
+        if (autoRotate) {
+          userRotRef.current.y += delta * 0.45;
+        }
+      }
+
+      // Clamp vertical pitch to prevent inversion
+      userRotRef.current.x = Math.max(-1.25, Math.min(1.25, userRotRef.current.x));
+
+      rotGroupRef.current.rotation.x = userRotRef.current.x;
+      rotGroupRef.current.rotation.y = userRotRef.current.y;
+    }
+  });
 
   // Calculate 3D world position corresponding to the cart button (#open-cart-btn) on screen
   const getCartTargetPosition = useCallback((): THREE.Vector3 => {
@@ -72,21 +121,19 @@ function SceneController({ edition }: SceneControllerProps) {
 
   // Main ball throw handler
   const handleThrow = useCallback(
-    (throwEdition: BallEdition) => {
-      // 1. Get current world position of the main ball
+    (throwEdition: BallEdition | 'custom', conf?: CustomBallConfig) => {
       const startPos = new THREE.Vector3();
       if (mainBallInnerRef.current) {
         mainBallInnerRef.current.getWorldPosition(startPos);
       } else if (groupRef.current) {
         groupRef.current.getWorldPosition(startPos);
       } else {
-        startPos.set(0, initialY, 0);
+        startPos.set(0, landingInitialY, 0);
       }
 
-      // 2. Get target position of the cart button
       const targetPos = getCartTargetPosition();
 
-      // 3. Compute control point for high parabolic basketball jumper arc
+      // Parabolic jump shot arc
       const apexY = Math.max(startPos.y, targetPos.y) + (isMobile ? 1.6 : 2.4);
       const controlPos = new THREE.Vector3(
         startPos.x * 0.45 + targetPos.x * 0.55,
@@ -94,12 +141,13 @@ function SceneController({ edition }: SceneControllerProps) {
         (startPos.z + targetPos.z) / 2 + 0.3
       );
 
-      // 4. Anticipation squash on main ball, then hide it as projectile takes over
+      // Anticipation squash on ball
       if (mainBallWrapperRef.current) {
         gsap.killTweensOf(mainBallWrapperRef.current.scale);
         gsap.killTweensOf(mainBallWrapperRef.current.position);
 
-        gsap.timeline()
+        gsap
+          .timeline()
           .to(mainBallWrapperRef.current.scale, {
             y: 0.84,
             x: 1.12,
@@ -116,13 +164,14 @@ function SceneController({ edition }: SceneControllerProps) {
           });
       }
 
-      // 5. Spawn projectile ball that flies along the arc
+      // Spawn projectile ball that flies along the arc
       const newId = Date.now() + Math.random();
       setProjectiles((prev) => [
         ...prev,
         {
           id: newId,
           edition: throwEdition,
+          customConfig: conf || (throwEdition === 'custom' ? customConfig : undefined),
           startPos,
           controlPos,
           targetPos,
@@ -130,7 +179,7 @@ function SceneController({ edition }: SceneControllerProps) {
         },
       ]);
 
-      // 6. Schedule fresh ball rack feed drop-in
+      // Schedule fresh ball rack feed drop-in
       if (!isRespawningRef.current) {
         isRespawningRef.current = true;
         setTimeout(() => {
@@ -152,41 +201,67 @@ function SceneController({ edition }: SceneControllerProps) {
         }, 550);
       }
     },
-    [getCartTargetPosition, initialY, isMobile, responsiveScale]
+    [getCartTargetPosition, landingInitialY, isMobile, responsiveScale, customConfig]
   );
 
-  const handleProjectileLanded = useCallback((id: number, landedEdition: BallEdition) => {
-    // Remove projectile from scene
-    setProjectiles((prev) => prev.filter((p) => p.id !== id));
+  const handleProjectileLanded = useCallback(
+    (id: number, landedEdition: BallEdition | 'custom') => {
+      setProjectiles((prev) => prev.filter((p) => p.id !== id));
 
-    // Dispatch custom event to notify UI that ball swished into cart
-    window.dispatchEvent(
-      new CustomEvent('tuku:ball-landed', {
-        detail: { edition: landedEdition },
-      })
-    );
-  }, []);
+      window.dispatchEvent(
+        new CustomEvent('tuku:ball-landed', {
+          detail: { edition: landedEdition },
+        })
+      );
+    },
+    []
+  );
 
-  // Listen for global throw trigger event
+  // Listen for global throw trigger event and reset rotation
   useEffect(() => {
     const onThrowEvent = (e: Event) => {
-      const customEvent = e as CustomEvent<{ edition: BallEdition }>;
-      const targetEd = customEvent.detail?.edition || edition;
-      handleThrow(targetEd);
+      const customEvent = e as CustomEvent<{
+        edition?: BallEdition | 'custom';
+        customConfig?: CustomBallConfig;
+      }>;
+      const targetEd = customEvent.detail?.edition || (viewMode === 'customizer' ? 'custom' : edition);
+      const conf = customEvent.detail?.customConfig || customConfig;
+      handleThrow(targetEd, conf);
+    };
+
+    const onResetRotation = () => {
+      userRotRef.current = { x: 0.1, y: 0.35 };
+      rotVelocityRef.current = { x: 0, y: 0 };
     };
 
     window.addEventListener('tuku:throw-ball', onThrowEvent);
+    window.addEventListener('tuku-throw-ball', onThrowEvent);
+    window.addEventListener('tuku-reset-rotation', onResetRotation);
     return () => {
       window.removeEventListener('tuku:throw-ball', onThrowEvent);
+      window.removeEventListener('tuku-throw-ball', onThrowEvent);
+      window.removeEventListener('tuku-reset-rotation', onResetRotation);
     };
-  }, [edition, handleThrow]);
+  }, [edition, viewMode, customConfig, handleThrow]);
 
-  // ScrollTrigger timeline setup
+  // Position transition and ScrollTrigger
   useEffect(() => {
     if (!groupRef.current) return;
 
+    if (viewMode === 'customizer') {
+      gsap.to(groupRef.current.position, {
+        x: customizerTargetPos.x,
+        y: customizerTargetPos.y,
+        z: customizerTargetPos.z,
+        duration: 0.65,
+        ease: 'power3.out',
+      });
+      return;
+    }
+
+    // Landing view mode: ScrollTrigger timeline setup
     ScrollTrigger.refresh();
-    groupRef.current.position.set(0, initialY, 0);
+    groupRef.current.position.set(0, landingInitialY, 0);
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
@@ -202,8 +277,8 @@ function SceneController({ edition }: SceneControllerProps) {
       const zOffset = isMobile ? 0.9 : 1.8;
 
       tl.fromTo(
-        groupRef.current.position,
-        { x: 0, y: initialY, z: 0 },
+        groupRef.current!.position,
+        { x: 0, y: landingInitialY, z: 0 },
         {
           x: xOffset,
           y: isMobile ? -0.35 : -0.8,
@@ -211,47 +286,114 @@ function SceneController({ edition }: SceneControllerProps) {
           duration: 1,
         }
       )
-        .to(groupRef.current.position, {
+        .to(groupRef.current!.position, {
           x: -xOffset,
           y: isMobile ? 0.35 : 0.6,
           z: zOffset * 0.75,
           duration: 1,
         })
-        .to(groupRef.current.position, {
+        .to(groupRef.current!.position, {
           x: xOffset * 0.75,
           y: isMobile ? -0.2 : -0.4,
           z: zOffset * 0.85,
           duration: 1,
         })
-        .to(groupRef.current.position, {
+        .to(groupRef.current!.position, {
           x: 0,
           y: isMobile ? 0.05 : 0.1,
           z: isMobile ? 1.2 : 2.2,
           duration: 1,
         });
 
-      tl.to(groupRef.current.rotation, { x: Math.PI * 0.8, y: Math.PI * 2.2, duration: 1 }, 0)
-        .to(groupRef.current.rotation, { x: Math.PI * 1.8, y: Math.PI * 4.4, duration: 1 }, 1)
-        .to(groupRef.current.rotation, { x: Math.PI * 2.6, y: Math.PI * 6.2, duration: 1 }, 2)
-        .to(groupRef.current.rotation, { x: Math.PI * 3.4, y: Math.PI * 8.0, duration: 1 }, 3);
+      tl.to(groupRef.current!.rotation, { x: Math.PI * 0.8, y: Math.PI * 2.2, duration: 1 }, 0)
+        .to(groupRef.current!.rotation, { x: Math.PI * 1.8, y: Math.PI * 4.4, duration: 1 }, 1)
+        .to(groupRef.current!.rotation, { x: Math.PI * 2.6, y: Math.PI * 6.2, duration: 1 }, 2)
+        .to(groupRef.current!.rotation, { x: Math.PI * 3.4, y: Math.PI * 8.0, duration: 1 }, 3);
     });
 
     return () => ctx.revert();
-  }, [isMobile, isTablet, initialY]);
+  }, [viewMode, isMobile, isTablet, landingInitialY, customizerTargetPos.x, customizerTargetPos.y, customizerTargetPos.z]);
+
+  // Pointer drag interaction for customizer mode
+  useEffect(() => {
+    if (viewMode !== 'customizer') return;
+
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.closest('button') ||
+        target.closest('input') ||
+        target.closest('textarea') ||
+        target.closest('a') ||
+        target.closest('#open-cart-btn') ||
+        target.closest('aside')
+      ) {
+        return;
+      }
+
+      isDraggingRef.current = true;
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      prevPointerRef.current = { x: clientX, y: clientY };
+    };
+
+    const handlePointerMove = (e: MouseEvent | TouchEvent) => {
+      if (!isDraggingRef.current) return;
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+      const deltaX = clientX - prevPointerRef.current.x;
+      const deltaY = clientY - prevPointerRef.current.y;
+
+      prevPointerRef.current = { x: clientX, y: clientY };
+
+      rotVelocityRef.current = {
+        x: deltaY * 0.005,
+        y: deltaX * 0.005,
+      };
+    };
+
+    const handlePointerUp = () => {
+      isDraggingRef.current = false;
+    };
+
+    window.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+    window.addEventListener('touchstart', handlePointerDown, { passive: true });
+    window.addEventListener('touchmove', handlePointerMove, { passive: true });
+    window.addEventListener('touchend', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('mousedown', handlePointerDown);
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('mouseup', handlePointerUp);
+      window.removeEventListener('touchstart', handlePointerDown);
+      window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('touchend', handlePointerUp);
+    };
+  }, [viewMode]);
 
   return (
     <>
       {/* Main Interactive Floating Basketball */}
-      <group ref={groupRef} position={[0, initialY, 0]}>
+      <group ref={groupRef} position={[0, landingInitialY, 0]}>
         <group ref={mainBallWrapperRef}>
           <Float
-            speed={2.2}
-            rotationIntensity={0.5}
-            floatIntensity={isMobile ? 0.35 : 0.9}
-            floatingRange={isMobile ? [-0.08, 0.08] : [-0.18, 0.18]}
+            speed={viewMode === 'customizer' ? 1.4 : 2.2}
+            rotationIntensity={viewMode === 'customizer' ? 0.08 : 0.5}
+            floatIntensity={isMobile ? 0.3 : 0.8}
+            floatingRange={isMobile ? [-0.06, 0.06] : [-0.15, 0.15]}
           >
-            <group ref={mainBallInnerRef}>
-              <Basketball edition={edition} scale={responsiveScale} />
+            <group ref={rotGroupRef}>
+              <group ref={mainBallInnerRef}>
+                <Basketball
+                  edition={edition}
+                  customConfig={viewMode === 'customizer' ? customConfig : undefined}
+                  scale={responsiveScale}
+                  autoRotate={viewMode === 'landing'}
+                />
+              </group>
             </group>
           </Float>
         </group>
@@ -263,6 +405,7 @@ function SceneController({ edition }: SceneControllerProps) {
           key={p.id}
           id={p.id}
           edition={p.edition}
+          customConfig={p.customConfig}
           startPos={p.startPos}
           controlPos={p.controlPos}
           targetPos={p.targetPos}
@@ -276,11 +419,25 @@ function SceneController({ edition }: SceneControllerProps) {
 
 interface CanvasContainerProps {
   edition?: BallEdition;
+  viewMode?: AppView;
+  customConfig?: CustomBallConfig;
+  autoRotate?: boolean;
 }
 
-export function CanvasContainer({ edition = 'nebula' }: CanvasContainerProps) {
+export function CanvasContainer({
+  edition = 'nebula',
+  viewMode = 'landing',
+  customConfig = {
+    baseColor: '#ff5722',
+    lineColor: '#111111',
+    textureType: 'classic',
+  },
+  autoRotate = true,
+}: CanvasContainerProps) {
   const shadowColor =
-    edition === 'nebula'
+    viewMode === 'customizer'
+      ? customConfig.baseColor || '#ff5722'
+      : edition === 'nebula'
       ? '#00c2ff'
       : edition === 'fuego'
       ? '#ff5722'
@@ -295,9 +452,19 @@ export function CanvasContainer({ edition = 'nebula' }: CanvasContainerProps) {
         camera={{ position: [0, 0, 6], fov: 45 }}
         gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
       >
-        <ambientLight intensity={0.75} />
+        <ambientLight intensity={0.8} />
         <spotLight position={[8, 14, 8]} angle={0.28} penumbra={1} intensity={2.0} castShadow />
-        <directionalLight position={[-8, -4, -4]} intensity={0.6} color={edition === 'nebula' ? '#00e5ff' : '#ff7733'} />
+        <directionalLight
+          position={[-8, -4, -4]}
+          intensity={0.65}
+          color={
+            viewMode === 'customizer'
+              ? customConfig.baseColor || '#ff7733'
+              : edition === 'nebula'
+              ? '#00e5ff'
+              : '#ff7733'
+          }
+        />
         <directionalLight position={[0, 7, 5]} intensity={0.7} color="#ffffff" />
 
         <Suspense fallback={null}>
@@ -309,14 +476,25 @@ export function CanvasContainer({ edition = 'nebula' }: CanvasContainerProps) {
                 rotation-y={Math.PI / 2}
                 position={[-5, 1, -1]}
                 scale={[20, 0.2, 1]}
-                color={edition === 'nebula' ? '#00e5ff' : '#ffaa55'}
+                color={
+                  viewMode === 'customizer'
+                    ? customConfig.baseColor || '#ffaa55'
+                    : edition === 'nebula'
+                    ? '#00e5ff'
+                    : '#ffaa55'
+                }
               />
               <Lightformer intensity={1.5} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={[20, 0.5, 1]} />
               <Lightformer intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[20, 1, 1]} color="#ffffff" />
             </group>
           </Environment>
 
-          <SceneController edition={edition} />
+          <SceneController
+            edition={edition}
+            viewMode={viewMode}
+            customConfig={customConfig}
+            autoRotate={autoRotate}
+          />
 
           <ContactShadows
             position={[0, -2.5, 0]}

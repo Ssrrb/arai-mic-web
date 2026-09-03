@@ -5,12 +5,14 @@ interface BackgroundTypographyProps {
   modelName: string;
   bgLeft?: string;
   bgRight?: string;
+  isCustomizer?: boolean;
 }
 
 export function BackgroundTypography({
   modelName,
   bgLeft,
   bgRight,
+  isCustomizer = false,
 }: BackgroundTypographyProps) {
   const [scrollY, setScrollY] = useState(0);
 
@@ -22,6 +24,25 @@ export function BackgroundTypography({
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  if (isCustomizer) {
+    return (
+      <div className="fixed inset-0 z-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+        {/* Top-right large CUSTOM LAB EDITION branding as in screenshot */}
+        <div className="absolute top-6 sm:top-8 right-6 sm:right-12 text-right flex flex-col items-end">
+          <span className="font-headline font-black text-[#2e333b] tracking-tight uppercase leading-none text-[clamp(4.2rem,9.5vw,9.5rem)]">
+            CUSTOM
+          </span>
+          <span className="font-headline tracking-[0.38em] text-[#3f4551] uppercase text-[clamp(0.85rem,1.4vw,1.35rem)] -mt-1 sm:-mt-2 mr-1">
+            LAB EDITION
+          </span>
+        </div>
+
+        {/* Reference floating orbital dot positioned beside the custom ball */}
+        <div className="hidden lg:block absolute left-[54%] top-[34%] w-4 h-4 rounded-full bg-[#525763] opacity-80" />
+      </div>
+    );
+  }
 
   // Compute fade out and parallax effect based on scroll
   const opacity = Math.max(0, 1 - scrollY / 320);

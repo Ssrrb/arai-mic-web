@@ -27,23 +27,50 @@ import {
 import { BallEdition } from './Basketball';
 import { EDITIONS_LIST } from '../data/editions';
 import { CartItem } from '../types';
+import { WhatsAppCheckoutModal } from './WhatsAppCheckoutModal';
+import { CartDrawer } from './CartDrawer';
+import {
+  playButtonClick,
+  playEditionSound,
+  playModalOpenSound,
+  playModalCloseSound,
+  playAddToCartLaunchSound,
+  isSoundMuted,
+  toggleSound,
+  initGlobalButtonSoundListener,
+} from '../utils/audio';
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface OverlayProps {
   edition: BallEdition;
   onSelectEdition: (ed: BallEdition) => void;
+  onOpenCustomizer: () => void;
+  cart: CartItem[];
+  setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
+  isMuted: boolean;
+  onToggleMute: () => void;
 }
 
-export function Overlay({ edition, onSelectEdition }: OverlayProps) {
+export function Overlay({
+  edition,
+  onSelectEdition,
+  onOpenCustomizer,
+  cart,
+  setCart,
+  isCartOpen,
+  setIsCartOpen,
+  isMuted,
+  onToggleMute,
+}: OverlayProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isTechModalOpen, setIsTechModalOpen] = useState(false);
   const [isPromoVideoOpen, setIsPromoVideoOpen] = useState(false);
-  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -53,9 +80,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
       const scrollPos = window.scrollY + 260;
       const ingEl = document.getElementById('ingenieria');
 
-      if (rendEl && scrollPos >= rendEl.offsetTop) {
-        setActiveSection('rendimiento');
-      } else if (ingEl && scrollPos >= ingEl.offsetTop) {
+      if (ingEl && scrollPos >= ingEl.offsetTop) {
         setActiveSection('ingenieria');
       } else {
         setActiveSection(null);
@@ -66,11 +91,6 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Customize modal state
-  const [customTexture, setCustomTexture] = useState('Granulado Pro');
-  const [customChannel, setCustomChannel] = useState('Negro Profundo');
-  const [customText, setCustomText] = useState('');
-
   // Video modal state
   const [isVideoMuted, setIsVideoMuted] = useState(true);
 
@@ -80,18 +100,17 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
   const [contactMessage, setContactMessage] = useState('');
   const [contactSent, setContactSent] = useState(false);
 
-  // Cart State
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [lang, setLang] = useState<'es'>('es');
 
-  // Checkout flow state
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [orderCompleted, setOrderCompleted] = useState(false);
-  const [buyerName, setBuyerName] = useState('');
-  const [buyerEmail, setBuyerEmail] = useState('');
-  const [buyerAddress, setBuyerAddress] = useState('');
+  // WhatsApp Checkout Modal state
+  const [isWhatsAppCheckoutOpen, setIsWhatsAppCheckoutOpen] = useState(false);
+  const [checkoutItems, setCheckoutItems] = useState<CartItem[]>([]);
 
   const currentEditionData = EDITIONS_LIST.find((e) => e.id === edition) || EDITIONS_LIST[0];
+
+  const formatPYG = (amount: number): string => {
+    return `₲ ${Math.round(amount).toLocaleString('es-PY')}`;
+  };
 
   const totalCartItems = cart.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -137,6 +156,9 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
   }, [edition]);
 
   const addToCart = (edId: BallEdition) => {
+    // Play energetic jump-shot release sound
+    playAddToCartLaunchSound();
+
     const itemData = EDITIONS_LIST.find((item) => item.id === edId) || EDITIONS_LIST[0];
     const itemId = edId;
 
@@ -161,7 +183,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
       ];
     });
 
-    showToast(`🏀 ${itemData.bgText} añadido al carrito ($${itemData.price.toFixed(2)})`);
+    showToast(`🏀 ${itemData.bgText} añadido al carrito (${formatPYG(itemData.price)})`);
 
     // 1. GSAP button tactile press & spring bounce
     const activeBtn = document.activeElement as HTMLElement | null;
@@ -197,29 +219,96 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
         })
         .filter(Boolean) as CartItem[]
     );
+
+    setCheckoutItems((prev) =>
+      prev
+        .map((item) => {
+          if (item.id === id) {
+            const newQty = item.quantity + delta;
+            return newQty > 0 ? { ...item, quantity: newQty } : null;
+          }
+          return item;
+        })
+        .filter(Boolean) as CartItem[]
+    );
   };
 
   const removeFromCart = (id: string) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
+    setCheckoutItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!buyerName || !buyerEmail) return;
-    setOrderCompleted(true);
+  const handleOpenBuyFlow = (targetEdition?: BallEdition) => {
+    const targetId = targetEdition || edition;
+    const itemData = EDITIONS_LIST.find((e) => e.id === targetId) || EDITIONS_LIST[0];
+
+    // If cart has no items, start buy flow with this ball
+    if (cart.length === 0) {
+      const singleItem: CartItem = {
+        id: targetId,
+        edition: targetId,
+        name: `${itemData.bgText} ${itemData.name}`,
+        price: itemData.price,
+        quantity: 1,
+        color: itemData.color,
+      };
+      setCheckoutItems([singleItem]);
+      // Also add to cart for seamlessness
+      setCart([singleItem]);
+    } else {
+      // If ball not in cart, add it
+      const exists = cart.find((i) => i.id === targetId);
+      if (!exists) {
+        const newItem: CartItem = {
+          id: targetId,
+          edition: targetId,
+          name: `${itemData.bgText} ${itemData.name}`,
+          price: itemData.price,
+          quantity: 1,
+          color: itemData.color,
+        };
+        const updated = [...cart, newItem];
+        setCart(updated);
+        setCheckoutItems(updated);
+      } else {
+        setCheckoutItems([...cart]);
+      }
+    }
+
+    playModalOpenSound();
+    setIsCartOpen(false);
+    setIsWhatsAppCheckoutOpen(true);
+  };
+
+  const handleCheckoutFromCart = () => {
+    if (cart.length === 0) return;
+    setCheckoutItems([...cart]);
+    setIsCartOpen(false);
+    playModalOpenSound();
+    setIsWhatsAppCheckoutOpen(true);
   };
 
   const handlePrevEdition = () => {
     const currentIndex = EDITIONS_LIST.findIndex((e) => e.id === edition);
     const prevIndex = (currentIndex - 1 + EDITIONS_LIST.length) % EDITIONS_LIST.length;
-    onSelectEdition(EDITIONS_LIST[prevIndex].id);
+    const targetEdition = EDITIONS_LIST[prevIndex].id;
+    playEditionSound(targetEdition);
+    onSelectEdition(targetEdition);
   };
 
   const handleNextEdition = () => {
     const currentIndex = EDITIONS_LIST.findIndex((e) => e.id === edition);
     const nextIndex = (currentIndex + 1) % EDITIONS_LIST.length;
-    onSelectEdition(EDITIONS_LIST[nextIndex].id);
+    const targetEdition = EDITIONS_LIST[nextIndex].id;
+    playEditionSound(targetEdition);
+    onSelectEdition(targetEdition);
   };
+
+  // Mount global tactile button audio listener
+  useEffect(() => {
+    const cleanup = initGlobalButtonSoundListener();
+    return cleanup;
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -307,27 +396,12 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
               <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-white/70 transition-all duration-200 group-hover:w-full" />
             )}
           </a>
-          <a
-            href="#rendimiento"
-            className={`uppercase tracking-[0.16em] transition-all duration-200 py-1.5 relative group ${
-              activeSection === 'rendimiento'
-                ? 'text-white font-bold'
-                : 'text-zinc-400 hover:text-white font-medium'
-            }`}
-          >
-          //TODO: Elimina rendimiento del header
-            {activeSection === 'rendimiento' ? (
-              <span
-                className="absolute bottom-0 left-0 w-full h-[2px] rounded-full transition-colors duration-300"
-                style={{ backgroundColor: currentEditionData.color }}
-              />
-            ) : (
-              <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-white/70 transition-all duration-200 group-hover:w-full" />
-            )}
-          </a>
           <button
             id="nav-customize-btn"
-            onClick={() => setIsCustomizeOpen(true)}
+            onClick={() => {
+              playButtonClick('nav');
+              onOpenCustomizer();
+            }}
             className="uppercase tracking-[0.16em] text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer py-1.5 relative group"
           >
             <span>Personalizar</span>
@@ -335,7 +409,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           </button>
           <button
             id="nav-contacts-btn"
-            onClick={() => setIsContactOpen(true)}
+            onClick={() => {
+              playModalOpenSound();
+              setIsContactOpen(true);
+            }}
             className="uppercase tracking-[0.16em] text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer py-1.5 relative group"
           >
             <span>Contacto</span>
@@ -343,11 +420,30 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           </button>
         </nav>
 
-        {/* Right Actions: User Profile & Cart */}
+        {/* Right Actions: Audio Toggle, User Profile & Cart */}
         <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Audio Feedback Controller */}
+          <button
+            id="audio-toggle-btn"
+            data-sound-custom="true"
+            onClick={onToggleMute}
+            className="w-10 h-10 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
+            aria-label={isMuted ? 'Activar sonido de botones' : 'Silenciar sonido de botones'}
+            title={isMuted ? 'Activar sonido de botones' : 'Silenciar sonido de botones'}
+          >
+            {isMuted ? (
+              <VolumeX className="w-4 h-4 text-zinc-500" />
+            ) : (
+              <Volume2 className="w-4 h-4 text-[#ff5722]" />
+            )}
+          </button>
+
           <button
             id="user-profile-btn"
-            onClick={() => setIsUserModalOpen(true)}
+            onClick={() => {
+              playModalOpenSound();
+              setIsUserModalOpen(true);
+            }}
             className="w-10 h-10 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
             aria-label="Perfil de usuario"
           >
@@ -356,7 +452,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
 
           <button
             id="open-cart-btn"
-            onClick={() => setIsCartOpen(true)}
+            onClick={() => {
+              playModalOpenSound();
+              setIsCartOpen(true);
+            }}
             className="w-10 h-10 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95 relative group"
             aria-label="Carrito de compras"
           >
@@ -397,25 +496,14 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           >
             Ingeniería
           </a>
-          <a
-            href="#rendimiento"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-xs uppercase tracking-widest py-2.5 transition-colors border-b border-white/5 ${
-              activeSection === 'rendimiento'
-                ? 'text-white font-bold'
-                : 'text-zinc-300 hover:text-white font-medium'
-            }`}
-          >
-            Rendimiento
-          </a>
           <button
             onClick={() => {
               setMobileMenuOpen(false);
-              setIsCustomizeOpen(true);
+              onOpenCustomizer();
             }}
             className="text-left text-xs uppercase tracking-widest text-zinc-300 hover:text-white py-2.5 cursor-pointer font-medium border-b border-white/5"
           >
-            Personalizar
+            Personalizar (360.000 Gs)
           </button>
           <button
             onClick={() => {
@@ -436,7 +524,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           <div className="pointer-events-auto flex items-center gap-2.5 sm:gap-3">
             <button
               id="open-promo-video-btn"
-              onClick={() => setIsPromoVideoOpen(true)}
+              onClick={() => {
+                playModalOpenSound();
+                setIsPromoVideoOpen(true);
+              }}
               aria-label="Reproducir video promocional"
               className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-zinc-700/80 bg-zinc-900/70 hover:bg-zinc-800/90 text-white flex items-center justify-center transition-all cursor-pointer group shadow-lg active:scale-95"
             >
@@ -482,22 +573,17 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                 className="text-4xl lg:text-5xl font-mono font-normal tracking-tight leading-none transition-colors duration-300"
                 style={{ color: currentEditionData.color }}
               >
-                ${currentEditionData.price.toFixed(2)}
+                {formatPYG(currentEditionData.price)}
               </div>
               <div className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mt-2">
                 TALLA: <span className="text-white">29.5"</span> • OFICIAL
               </div>
               <div className="text-xs text-zinc-500 font-semibold mt-3 tracking-wider uppercase flex items-center gap-1.5">
-                <span
-                  className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
-                  style={{ backgroundColor: currentEditionData.color }}
-                />
-                <span>ESPAÑOL</span>
               </div>
             </div>
 
-            {/* Bottom Center: ADD TO CART Button */}
-            <div className="flex flex-col items-center justify-end pb-1">
+            {/* Bottom Center: AÑADIR AL CARRITO Button */}
+            <div className="flex items-center justify-center pb-1">
               <button
                 id="hero-add-to-cart-btn"
                 onClick={() => addToCart(edition)}
@@ -506,7 +592,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                   backgroundColor: currentEditionData.color,
                   boxShadow: `0 18px 36px -8px ${currentEditionData.glow || `${currentEditionData.color}50`}`,
                 }}
-                className="px-12 lg:px-16 py-3.5 lg:py-4 active:scale-95 text-black font-black text-xs lg:text-sm tracking-widest uppercase rounded-md transition-all duration-300 cursor-pointer whitespace-nowrap flex items-center justify-center gap-2 hover:brightness-110"
+                className="px-10 lg:px-14 py-3.5 lg:py-4 active:scale-95 text-black font-black text-xs lg:text-sm tracking-widest uppercase rounded-md transition-all duration-300 cursor-pointer whitespace-nowrap flex items-center justify-center gap-2 hover:brightness-110"
               >
                 {isShooting ? (
                   <>
@@ -514,7 +600,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                     <span>¡LANZANDO AL ARO! 🏀</span>
                   </>
                 ) : (
-                  <span>AÑADIR AL CARRITO</span>
+                  <>
+                    <ShoppingBag className="w-4 h-4 text-black" />
+                    <span>AÑADIR AL CARRITO</span>
+                  </>
                 )}
               </button>
             </div>
@@ -527,7 +616,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => onSelectEdition(item.id)}
+                      onClick={() => {
+                        playEditionSound(item.id);
+                        onSelectEdition(item.id);
+                      }}
                       aria-label={`Seleccionar edición ${item.name}`}
                       className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border transition-all cursor-pointer text-[10px] font-bold uppercase tracking-wider"
                       style={{
@@ -549,7 +641,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                 id="prev-edition-btn"
                 onClick={handlePrevEdition}
                 aria-label="Balón anterior"
-                className="w-12 h-12 rounded-lg border border-zinc-700/80 bg-zinc-950/80 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                className="w-12 h-12 rounded-full border border-zinc-700/80 bg-zinc-950/80 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -573,7 +665,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => onSelectEdition(item.id)}
+                    onClick={() => {
+                      playEditionSound(item.id);
+                      onSelectEdition(item.id);
+                    }}
                     aria-label={`Seleccionar edición ${item.name}`}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer text-[10px] font-bold uppercase tracking-wider"
                     style={{
@@ -599,33 +694,38 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                 className="text-4xl sm:text-5xl font-mono font-normal tracking-tight leading-none transition-colors duration-300"
                 style={{ color: currentEditionData.color }}
               >
-                ${currentEditionData.price.toFixed(2)}
+                {formatPYG(currentEditionData.price)}
               </div>
               <div className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mt-2">
                 TALLA: <span className="text-white">29.5"</span> • OFICIAL
               </div>
             </div>
 
-            {/* ADD TO CART full width button for optimal thumb ergonomics */}
-            <button
-              id="mobile-hero-add-to-cart-btn"
-              onClick={() => addToCart(edition)}
-              disabled={isShooting}
-              style={{
-                backgroundColor: currentEditionData.color,
-                boxShadow: `0 14px 28px -6px ${currentEditionData.glow || `${currentEditionData.color}40`}`,
-              }}
-              className="w-full py-4 active:scale-[0.98] text-black font-black text-xs tracking-widest uppercase rounded-lg transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2 hover:brightness-110"
-            >
-              {isShooting ? (
-                <>
-                  <Sparkles className="w-4 h-4 animate-spin text-black" />
-                  <span>¡LANZANDO AL ARO! 🏀</span>
-                </>
-              ) : (
-                <span>AÑADIR AL CARRITO</span>
-              )}
-            </button>
+            {/* Single AÑADIR AL CARRITO button */}
+            <div className="w-full">
+              <button
+                id="mobile-hero-add-to-cart-btn"
+                onClick={() => addToCart(edition)}
+                disabled={isShooting}
+                style={{
+                  backgroundColor: currentEditionData.color,
+                  boxShadow: `0 14px 28px -6px ${currentEditionData.glow || `${currentEditionData.color}40`}`,
+                }}
+                className="w-full py-3.5 sm:py-4 active:scale-[0.98] text-black font-black text-xs tracking-widest uppercase rounded-lg transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2 hover:brightness-110 shadow-lg"
+              >
+                {isShooting ? (
+                  <>
+                    <Sparkles className="w-4 h-4 animate-spin text-black" />
+                    <span>¡LANZANDO! 🏀</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="w-4 h-4 text-black" />
+                    <span>AÑADIR AL CARRITO</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -677,7 +777,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
 
           <button
             id="tech-modal-btn"
-            onClick={() => setIsTechModalOpen(true)}
+            onClick={() => {
+              playModalOpenSound();
+              setIsTechModalOpen(true);
+            }}
             className="flex items-center gap-2 text-[#ff5722] font-bold text-xs uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
           >
             Ver Especificaciones <ArrowRight className="w-4 h-4" />
@@ -712,11 +815,11 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           <button
             id="add-cart-perf-btn"
             onClick={() => {
-              addToCart(edition);
+              handleOpenBuyFlow(edition);
             }}
             className="flex items-center gap-2 text-[#ff5722] font-bold text-xs uppercase tracking-wider hover:text-white transition-colors cursor-pointer justify-end w-full"
           >
-            Comprar y Lanzar al Carrito <ArrowRight className="w-4 h-4" />
+            Comprar {currentEditionData.name} por WhatsApp <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </section>
@@ -728,18 +831,18 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
             DOMINA LA DUELA
           </h2>
           <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto">
-            Balón oficial reglamentario 29.5" con despacho express directo a tu puerta.
+            Balón oficial reglamentario 29.5" con despacho express directo a tu puerta y atención por WhatsApp.
           </p>
 
           <button
             id="cta-add-to-cart-btn"
             onClick={() => {
-              addToCart(edition);
+              handleOpenBuyFlow(edition);
             }}
             className="px-8 py-3.5 bg-[#ff5000] text-white rounded-[2px] text-sm font-black uppercase tracking-widest hover:bg-white hover:text-zinc-950 active:scale-95 transition-all shadow-2xl shadow-[#ff5000]/30 cursor-pointer inline-flex items-center gap-2"
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>Comprar {currentEditionData.bgText} • ${currentEditionData.price.toFixed(2)} USD</span>
+            <span>Comprar {currentEditionData.bgText} • {formatPYG(currentEditionData.price)}</span>
           </button>
         </div>
       </section>
@@ -762,7 +865,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-2xl w-full p-6 relative shadow-2xl">
             <button
               id="close-promo-video-btn"
-              onClick={() => setIsPromoVideoOpen(false)}
+              onClick={() => {
+                playModalCloseSound();
+                setIsPromoVideoOpen(false);
+              }}
               className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -828,119 +934,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
         </div>
       )}
 
-      {/* MODAL: Customize Modal */}
-      {isCustomizeOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl">
-            <button
-              id="close-customize-modal-btn"
-              onClick={() => setIsCustomizeOpen(false)}
-              className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-colors cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
 
-            <div className="flex items-center gap-2 mb-2">
-              <Sliders className="w-5 h-5 text-[#ff5722]" />
-              <h3 className="font-display text-2xl font-black uppercase text-white tracking-wide">
-                Personalización a Medida
-              </h3>
-            </div>
-            <p className="text-xs text-zinc-400 mb-5">
-              Configura las especificaciones a medida para tu balón TUKU:
-            </p>
-
-            <div className="space-y-4 text-xs">
-              <div>
-                <label className="block text-zinc-300 font-bold uppercase tracking-wider mb-2">
-                  Edición Base
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {EDITIONS_LIST.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => onSelectEdition(item.id)}
-                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
-                        edition === item.id
-                          ? 'border-[#ff5722] bg-[#ff5722]/10 text-white font-bold'
-                          : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white'
-                      }`}
-                    >
-                      {item.bgText}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-zinc-300 font-bold uppercase tracking-wider mb-2">
-                  Textura de Piel
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['Granulado Pro', 'Agarre Asfalto', 'Cancha Suave'].map((tex) => (
-                    <button
-                      key={tex}
-                      onClick={() => setCustomTexture(tex)}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
-                        customTexture === tex
-                          ? 'border-[#ff5722] bg-zinc-800 text-white font-bold'
-                          : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white'
-                      }`}
-                    >
-                      {tex}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-zinc-300 font-bold uppercase tracking-wider mb-2">
-                  Color de Canales
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['Negro Profundo', 'Naranja Neón', 'Oro Metálico'].map((chan) => (
-                    <button
-                      key={chan}
-                      onClick={() => setCustomChannel(chan)}
-                      className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
-                        customChannel === chan
-                          ? 'border-[#ff5722] bg-zinc-800 text-white font-bold'
-                          : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white'
-                      }`}
-                    >
-                      {chan}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-zinc-300 font-bold uppercase tracking-wider mb-2">
-                  Grabado Láser Personalizado (Opcional)
-                </label>
-                <input
-                  type="text"
-                  maxLength={20}
-                  placeholder="Ej: KOBE #24 o TU NOMBRE"
-                  value={customText}
-                  onChange={(e) => setCustomText(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ff5722]"
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                setIsCustomizeOpen(false);
-                showToast(`Personalización guardada: ${currentEditionData.bgText} (${customTexture})`);
-              }}
-              className="mt-6 w-full py-3 bg-[#ff5722] hover:bg-white text-zinc-950 font-black uppercase tracking-wider rounded-xl text-xs transition-colors cursor-pointer"
-            >
-              Guardar y Aplicar
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* MODAL: Contacts Modal */}
       {isContactOpen && (
@@ -949,6 +943,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
             <button
               id="close-contact-modal-btn"
               onClick={() => {
+                playModalCloseSound();
                 setIsContactOpen(false);
                 setContactSent(false);
               }}
@@ -990,6 +985,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (!contactName || !contactEmail) return;
+                  playButtonClick('success');
                   setContactSent(true);
                 }}
                 className="space-y-3 text-xs"
@@ -1052,7 +1048,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl">
             <button
               id="close-user-modal-btn"
-              onClick={() => setIsUserModalOpen(false)}
+              onClick={() => {
+                playModalCloseSound();
+                setIsUserModalOpen(false);
+              }}
               className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -1105,7 +1104,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
             <button
               id="close-tech-modal-btn"
-              onClick={() => setIsTechModalOpen(false)}
+              onClick={() => {
+                playModalCloseSound();
+                setIsTechModalOpen(false);
+              }}
               className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
@@ -1136,7 +1138,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
 
             <button
               id="tech-modal-close-action"
-              onClick={() => setIsTechModalOpen(false)}
+              onClick={() => {
+                playModalCloseSound();
+                setIsTechModalOpen(false);
+              }}
               className="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
             >
               Cerrar
@@ -1146,251 +1151,32 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
       )}
 
       {/* DRAWER: Shopping Cart */}
-      {isCartOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-zinc-950 border-l border-zinc-800 h-full flex flex-col justify-between p-6 shadow-2xl overflow-y-auto">
-            {/* Drawer Header */}
-            <div>
-              <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
-                <div className="flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5 text-[#ff5722]" />
-                  <h3 className="font-display text-2xl font-black uppercase text-white tracking-wide">
-                    Carrito ({totalCartItems})
-                  </h3>
-                </div>
-                <button
-                  id="close-cart-btn"
-                  onClick={() => {
-                    setIsCartOpen(false);
-                    setIsCheckingOut(false);
-                    setOrderCompleted(false);
-                  }}
-                  className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-900 transition-colors cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cart={cart}
+        onUpdateQuantity={updateQuantity}
+        onRemoveFromCart={removeFromCart}
+        onCheckout={handleCheckoutFromCart}
+        onAddCurrentEdition={() => addToCart(edition)}
+        onSelectEdition={onSelectEdition}
+        onOpenCustomizer={onOpenCustomizer}
+        currentEdition={edition}
+      />
 
-              {/* Cart Content */}
-              {orderCompleted ? (
-                <div className="py-12 text-center">
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-7 h-7" />
-                  </div>
-                  <h4 className="font-display text-3xl font-black uppercase text-white mb-2">
-                    ¡Orden Confirmada!
-                  </h4>
-                  <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
-                    Hemos procesado tu compra por <strong className="text-white">${subtotal.toFixed(2)} USD</strong>. Te enviamos los detalles de despacho express a <span className="text-[#ff5722]">{buyerEmail}</span>.
-                  </p>
-                  <button
-                    id="finish-order-btn"
-                    onClick={() => {
-                      setCart([]);
-                      setIsCheckingOut(false);
-                      setOrderCompleted(false);
-                      setIsCartOpen(false);
-                    }}
-                    className="w-full py-3 bg-[#ff5722] text-zinc-950 font-black uppercase tracking-wider rounded-xl text-xs hover:bg-white transition-colors cursor-pointer"
-                  >
-                    Seguir Comprando
-                  </button>
-                </div>
-              ) : isCheckingOut ? (
-                <form onSubmit={handleCheckoutSubmit} className="py-4 space-y-3">
-                  <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">
-                    Datos de Envío
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">
-                      Nombre
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nombre y Apellidos"
-                      value={buyerName}
-                      onChange={(e) => setBuyerName(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ff5722]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">
-                      Correo Electrónico
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="tu@correo.com"
-                      value={buyerEmail}
-                      onChange={(e) => setBuyerEmail(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ff5722]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">
-                      Dirección de Entrega
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Calle, Ciudad, Código Postal"
-                      value={buyerAddress}
-                      onChange={(e) => setBuyerAddress(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ff5722]"
-                    />
-                  </div>
-
-                  <div className="pt-2 flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsCheckingOut(false)}
-                      className="w-1/3 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold uppercase tracking-wider rounded-xl text-xs transition-colors cursor-pointer"
-                    >
-                      Atrás
-                    </button>
-                    <button
-                      id="submit-checkout-btn"
-                      type="submit"
-                      className="w-2/3 py-2.5 bg-[#ff5722] hover:bg-white text-zinc-950 font-black uppercase tracking-wider rounded-xl text-xs transition-colors cursor-pointer"
-                    >
-                      Pagar ${subtotal.toFixed(2)} USD
-                    </button>
-                  </div>
-                </form>
-              ) : cart.length === 0 ? (
-                <div className="py-12 text-center">
-                  <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto mb-3 text-zinc-500">
-                    <ShoppingBag className="w-5 h-5" />
-                  </div>
-                  <p className="text-sm font-bold text-white mb-1">Tu carrito está vacío</p>
-                  <p className="text-xs text-zinc-400 mb-6">
-                    Añade la edición actual que estás visualizando o elige tu favorita:
-                  </p>
-
-                  <div className="space-y-3">
-                    <button
-                      id="empty-cart-add-current-btn"
-                      onClick={() => {
-                        addToCart(edition);
-                      }}
-                      className="w-full py-3 px-4 bg-[#ff5722] hover:bg-white text-zinc-950 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#ff5722]/10"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Añadir {currentEditionData.bgText} (${currentEditionData.price.toFixed(2)} USD)</span>
-                    </button>
-
-                    <div className="pt-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                      Otras Ediciones Disponibles
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      {EDITIONS_LIST.map((item) => (
-                        <button
-                          key={item.id}
-                          id={`empty-cart-add-${item.id}-btn`}
-                          onClick={() => {
-                            onSelectEdition(item.id);
-                            addToCart(item.id);
-                          }}
-                          className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                            edition === item.id
-                              ? 'bg-zinc-900 border-[#ff5722]/60 text-white'
-                              : 'bg-zinc-900/40 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
-                          }`}
-                        >
-                          <span
-                            className="w-2 h-2 rounded-full mb-0.5"
-                            style={{ backgroundColor: item.color }}
-                          />
-                          <span className="text-[11px] font-bold uppercase leading-tight">
-                            {item.bgText}
-                          </span>
-                          <span className="text-[10px] text-zinc-500 font-mono">
-                            ${item.price.toFixed(2)}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="py-4 space-y-3">
-                  {cart.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80 flex items-center justify-between gap-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-3 h-3 rounded-full shrink-0"
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <div>
-                          <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                            {item.name}
-                          </h4>
-                          <span className="text-[10px] text-zinc-400 font-medium">
-                            ${item.price.toFixed(2)} USD
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-lg p-0.5">
-                          <button
-                            onClick={() => updateQuantity(item.id, -1)}
-                            className="p-1 text-zinc-400 hover:text-white cursor-pointer"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="px-2 text-xs font-bold text-white">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="p-1 text-zinc-400 hover:text-white cursor-pointer"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
-                        </div>
-
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="p-1.5 text-zinc-500 hover:text-red-400 cursor-pointer transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Drawer Footer / Checkout CTA */}
-            {!orderCompleted && cart.length > 0 && !isCheckingOut && (
-              <div className="pt-4 border-t border-zinc-800 space-y-3">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-zinc-400 uppercase tracking-wider font-semibold">Envío Express</span>
-                  <span className="text-emerald-400 font-bold uppercase">Gratis</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-zinc-300 font-bold uppercase tracking-wider">Total</span>
-                  <span className="text-xl font-black text-white font-mono">${subtotal.toFixed(2)} USD</span>
-                </div>
-                <button
-                  id="proceed-checkout-btn"
-                  onClick={() => setIsCheckingOut(true)}
-                  className="w-full py-3.5 bg-[#ff5722] hover:bg-white text-zinc-950 font-black uppercase tracking-widest rounded-xl transition-all text-xs cursor-pointer shadow-lg shadow-[#ff5722]/20"
-                >
-                  Continuar al Pago
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* WHATSAPP CHECKOUT MODAL */}
+      <WhatsAppCheckoutModal
+        isOpen={isWhatsAppCheckoutOpen}
+        onClose={() => setIsWhatsAppCheckoutOpen(false)}
+        items={checkoutItems}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeFromCart}
+        onClearCart={() => {
+          setCart([]);
+          setCheckoutItems([]);
+        }}
+        accentColor={currentEditionData.color}
+      />
     </div>
   );
 }
