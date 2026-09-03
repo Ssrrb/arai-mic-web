@@ -60,25 +60,25 @@ const GRIP_TEXTURES: {
 }[] = [
   {
     id: 'classic',
-    label: 'CLASSIC',
-    sub: 'Micro-Pebbled NBA',
+    label: 'CLÁSICA',
+    sub: 'Microgranulado NBA',
     desc: 'Textura de micrograno oficial para canchas profesionales techadas.',
   },
   {
     id: 'street',
-    label: 'STREET',
+    label: 'CALLEJERA',
     sub: 'Asfalto Furtivo',
     desc: 'Compuesto abrasivo ultra-rugoso para máximo agarre en cemento y asfalto.',
   },
   {
     id: 'tech',
-    label: 'TECH',
+    label: 'TÉCNICA',
     sub: 'Matriz Hexagonal',
     desc: 'Estructura aeroespacial en panal de abeja con disipación de humedad.',
   },
   {
     id: 'cross',
-    label: 'CROSS',
+    label: 'CRUZADA',
     sub: 'Moleteado Diamante',
     desc: 'Patrón cruzado tipo moleteado olímpico para control biomecánico total.',
   },
@@ -216,7 +216,7 @@ export function CustomizerPage({
           className="flex items-center gap-2.5 text-zinc-400 hover:text-white group transition-colors cursor-pointer text-xs font-semibold tracking-wider uppercase"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Shop</span>
+          <span>Volver a la tienda</span>
         </button>
 
         {/* Brand center emblem */}
@@ -225,7 +225,7 @@ export function CustomizerPage({
             TUKU
           </span>
           <span className="text-[10px] uppercase font-bold tracking-widest text-[#ff5722] bg-[#ff5722]/10 px-2 py-0.5 rounded-full border border-[#ff5722]/30">
-            Custom Lab
+            Lab
           </span>
         </div>
 
@@ -242,7 +242,7 @@ export function CustomizerPage({
                 : 'border-white/10 bg-white/[0.03] text-zinc-400 hover:text-white'
             }`}
             title={autoRotate ? 'Pausar auto-rotación' : 'Activar auto-rotación 3D'}
-            aria-label="Toggle 3D auto rotation"
+            aria-label={autoRotate ? 'Pausar rotación automática 3D' : 'Activar rotación automática 3D'}
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -293,19 +293,7 @@ export function CustomizerPage({
           style={{ willChange: 'transform' }}
         >
           <div className="space-y-7">
-            {/* Top Back Link matching the exact reference typography */}
             <div>
-              <button
-                onClick={() => {
-                  playButtonClick('nav');
-                  onBackToShop();
-                }}
-                className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-colors cursor-pointer mb-5"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>BACK TO SHOP</span>
-              </button>
-
               {/* Big, powerful headline from reference */}
               <h1 className="font-headline font-black text-4xl sm:text-5xl lg:text-[54px] uppercase tracking-tight text-white leading-[0.92] drop-shadow-md">
                 CREA TU LEGADO
@@ -319,7 +307,7 @@ export function CustomizerPage({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                  BASE COLOR
+                  COLOR BASE
                 </span>
                 <span className="text-[11px] font-mono text-zinc-500 uppercase">
                   {config.baseColor}
@@ -371,7 +359,7 @@ export function CustomizerPage({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                  LINE COLOR
+                  COLOR DE LÍNEAS
                 </span>
                 <span className="text-[11px] font-mono text-zinc-500 uppercase">
                   {config.lineColor}
@@ -423,10 +411,10 @@ export function CustomizerPage({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                  GRIP TEXTURE
+                  TEXTURA DE AGARRE
                 </span>
                 <span className="text-[11px] font-semibold text-[#ff5722] uppercase">
-                  {config.textureType}
+                  {GRIP_TEXTURES.find((texture) => texture.id === config.textureType)?.label}
                 </span>
               </div>
 
@@ -489,7 +477,7 @@ export function CustomizerPage({
           <div className="pt-6 mt-6 border-t border-white/[0.08] space-y-2">
             <div className="flex justify-between items-baseline mb-1">
               <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                Precio Personalizado Fijo
+                Precio fijo personalizado
               </span>
               <span className="text-xl font-black font-mono text-white">
                 {formatPYG(FIXED_CUSTOM_PRICE)}
@@ -507,14 +495,11 @@ export function CustomizerPage({
               {/* Subtle light shimmer sweep on hover */}
               <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
 
-              <span className="font-mono text-xs font-bold opacity-80">
-                {formatPYG(FIXED_CUSTOM_PRICE)}
-              </span>
-              <span className="font-black">ADD TO COLLECTION</span>
+              <span className="font-black">AÑADIR A LA COLECCIÓN</span>
             </button>
 
             <p className="text-center text-[11px] text-zinc-500 font-medium">
-              Envío Express a Domicilio Gratis en todo Paraguay
+              Envío exprés gratis a domicilio en todo Paraguay
             </p>
           </div>
         </aside>
