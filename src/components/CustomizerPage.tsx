@@ -271,9 +271,17 @@ export function CustomizerPage({
       <div className="w-full flex-1 pt-16 pb-28 md:pb-6 flex flex-col md:flex-row justify-between items-start">
         {/* Left Customization Control Panel - Exactly styled like the user reference screenshot */}
         <aside
-          className="w-full md:w-[460px] lg:w-[490px] xl:w-[510px] pointer-events-auto bg-black/85 md:bg-black/80 backdrop-blur-2xl p-6 sm:p-8 md:min-h-[calc(100vh-4rem)] flex flex-col justify-between border-r border-white/[0.08] shadow-2xl relative z-30"
+          className="w-full md:w-[460px] lg:w-[490px] xl:w-[510px] pointer-events-none md:pointer-events-auto bg-transparent md:bg-black/80 md:backdrop-blur-2xl md:p-8 md:min-h-[calc(100vh-4rem)] flex flex-col justify-between md:border-r border-white/[0.08] md:shadow-2xl relative z-30"
           style={{ willChange: 'transform' }}
         >
+          {/* On mobile, reserve a clear viewport for the 3D ball before the controls. */}
+          <div className="h-[42svh] min-h-[300px] md:hidden shrink-0 flex items-end justify-center pb-5" aria-hidden="true">
+            <span className="text-[10px] uppercase tracking-[0.16em] text-zinc-400 bg-black/45 backdrop-blur-md border border-white/10 rounded-full px-3 py-1.5">
+              Deslizá sobre el balón para rotarlo
+            </span>
+          </div>
+
+          <div className="pointer-events-auto bg-black/95 backdrop-blur-2xl px-5 py-7 sm:px-8 sm:py-8 md:contents border-t border-white/[0.08] md:border-0 shadow-[0_-20px_45px_rgba(0,0,0,0.65)] md:shadow-none">
           <div className="space-y-7">
             <div>
               {/* Big, powerful headline from reference */}
@@ -483,6 +491,7 @@ export function CustomizerPage({
             <p className="text-center text-[11px] text-zinc-500 font-medium">
               Envío exprés gratis a domicilio en todo Paraguay
             </p>
+          </div>
           </div>
         </aside>
 

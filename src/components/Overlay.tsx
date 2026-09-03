@@ -605,7 +605,7 @@ export function Overlay({
                         onSelectEdition(item.id);
                       }}
                       aria-label={`Seleccionar edición ${item.name}`}
-                      className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border transition-all cursor-pointer text-[10px] font-bold uppercase tracking-wider"
+                      className="group w-8 h-8 rounded-full border transition-all cursor-pointer flex items-center justify-center"
                       style={{
                         borderColor: isActive ? item.color : 'rgba(255,255,255,0.12)',
                         backgroundColor: isActive ? `${item.color}25` : 'rgba(10,10,12,0.6)',
@@ -613,10 +613,9 @@ export function Overlay({
                       }}
                     >
                       <span
-                        className="w-2 h-2 rounded-full transition-transform group-hover:scale-125"
+                        className="w-3 h-3 rounded-full transition-transform group-hover:scale-125"
                         style={{ backgroundColor: item.color }}
                       />
-                      <span className="hidden xl:inline">{item.name}</span>
                     </button>
                   );
                 })}
@@ -654,7 +653,7 @@ export function Overlay({
                       onSelectEdition(item.id);
                     }}
                     aria-label={`Seleccionar edición ${item.name}`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer text-[10px] font-bold uppercase tracking-wider"
+                    className="w-8 h-8 rounded-full border transition-all cursor-pointer flex items-center justify-center"
                     style={{
                       borderColor: isActive ? item.color : 'rgba(255,255,255,0.12)',
                       backgroundColor: isActive ? `${item.color}25` : 'rgba(10,10,12,0.6)',
@@ -662,10 +661,9 @@ export function Overlay({
                     }}
                   >
                     <span
-                      className="w-2 h-2 rounded-full"
+                      className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: item.color }}
                     />
-                    <span>{item.name}</span>
                   </button>
                 );
               })}
