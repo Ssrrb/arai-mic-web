@@ -11,7 +11,6 @@ import {
   Trash2,
   Check,
   X,
-  Rotate3d,
   Menu,
   Sparkles,
   Play,
@@ -46,9 +45,29 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  // Monitor active scroll section for intelligent, dynamic header navigation
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 260;
+      const ingEl = document.getElementById('ingenieria');
+
+      if (rendEl && scrollPos >= rendEl.offsetTop) {
+        setActiveSection('rendimiento');
+      } else if (ingEl && scrollPos >= ingEl.offsetTop) {
+        setActiveSection('ingenieria');
+      } else {
+        setActiveSection(null);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Customize modal state
-  const [customTexture, setCustomTexture] = useState('Pebbled Pro');
+  const [customTexture, setCustomTexture] = useState('Granulado Pro');
   const [customChannel, setCustomChannel] = useState('Negro Profundo');
   const [customText, setCustomText] = useState('');
 
@@ -63,7 +82,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
 
   // Cart State
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [lang, setLang] = useState<'ru' | 'en' | 'es'>('ru');
+  const [lang, setLang] = useState<'es'>('es');
 
   // Checkout flow state
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -102,7 +121,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           { scale: 2.2, backgroundColor: '#ffffff', color: '#000000' },
           {
             scale: 1.0,
-            backgroundColor: '#00c2ff',
+            backgroundColor: itemData.color,
             color: '#09090b',
             duration: 0.5,
             ease: 'back.out(3.5)',
@@ -111,9 +130,9 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
       }
     };
 
-    window.addEventListener('slam-dunk:ball-landed', handleBallLanded);
+    window.addEventListener('tuku:ball-landed', handleBallLanded);
     return () => {
-      window.removeEventListener('slam-dunk:ball-landed', handleBallLanded);
+      window.removeEventListener('tuku:ball-landed', handleBallLanded);
     };
   }, [edition]);
 
@@ -160,7 +179,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
 
     // 3. Dispatch GSAP 3D ball throw into the cart
     window.dispatchEvent(
-      new CustomEvent('slam-dunk:throw-ball', {
+      new CustomEvent('tuku:throw-ball', {
         detail: { edition: edId },
       })
     );
@@ -237,70 +256,116 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
         </div>
       )}
 
-      {/* Header - Matching reference design */}
-      <header className="fixed top-0 left-0 w-full px-6 sm:px-12 py-5 flex justify-between items-center z-40 backdrop-blur-md bg-[#08080a]/40 border-b border-white/5 text-white">
-        {/* Brand Logo with SLAM DUNK icon */}
+      {/* Header - Expert UI/Front-End Implementation */}
+      <header className="fixed top-0 left-0 w-full px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center z-40 backdrop-blur-xl bg-zinc-950/75 border-b border-white/[0.08] text-white transition-all duration-300">
+        {/* Brand Logo with TUKU icon */}
         <button
           id="brand-logo-btn"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="flex items-center gap-3 group cursor-pointer"
+          className="flex items-center gap-3.5 group cursor-pointer text-left focus:outline-none"
+          aria-label="Ir al inicio de TUKU"
         >
-          <div className="w-8 h-8 rounded-full border-[2px] border-white flex items-center justify-center relative overflow-hidden group-hover:border-[#00c2ff] transition-colors">
-            {/* Center horizontal minus line icon */}
-            <div className="w-4 h-[2px] bg-white group-hover:bg-[#00c2ff] transition-colors rounded-full" />
+          {/* Refined Basketball Emblem */}
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/30 group-hover:border-white/80 flex items-center justify-center relative overflow-hidden transition-all duration-300 bg-white/[0.04] group-hover:bg-white/[0.08] shadow-[0_0_20px_rgba(255,255,255,0.06)] group-hover:shadow-[0_0_25px_rgba(255,255,255,0.15)] group-hover:scale-105">
+            {/* Center horizontal seam */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-full h-[1.5px] bg-white/60 group-hover:bg-white transition-colors" />
+            </div>
+            {/* Center vertical seam */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-full w-[1.5px] bg-white/60 group-hover:bg-white transition-colors" />
+            </div>
+            {/* Curved channel ellipse */}
+            <div className="absolute w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-white/20 group-hover:border-white/50 transition-colors" />
           </div>
-          <div className="text-left font-black uppercase text-xs leading-none tracking-wider text-white group-hover:text-[#00c2ff] transition-colors font-headline">
-            <div>SLAM</div>
-            <div>DUNK</div>
+
+          {/* Prominent, authoritative TUKU wordmark */}
+          <div className="flex flex-col">
+            <span className="font-headline text-2xl sm:text-3xl lg:text-[32px] tracking-[0.22em] font-black uppercase text-white leading-none group-hover:text-white transition-colors drop-shadow-sm">
+              TUKU
+            </span> 
           </div>
         </button>
 
-        {/* Center Navigation */}
-        <nav className="hidden md:flex items-center gap-10 text-xs font-semibold tracking-wider">
+        {/* Center Navigation - Normal neutral styling by default */}
+        <nav className="hidden md:flex items-center gap-8 lg:gap-11 text-xs font-semibold tracking-wider">
           <a
-            href="#ediciones"
-            className="text-[#ff5500] hover:text-[#ff7043] transition-colors font-bold"
+            href="#ingenieria"
+            className={`uppercase tracking-[0.16em] transition-all duration-200 py-1.5 relative group ${
+              activeSection === 'ingenieria'
+                ? 'text-white font-bold'
+                : 'text-zinc-400 hover:text-white font-medium'
+            }`}
           >
-            Products
+            <span>Ingeniería</span>
+            {activeSection === 'ingenieria' ? (
+              <span
+                className="absolute bottom-0 left-0 w-full h-[2px] rounded-full transition-colors duration-300"
+                style={{ backgroundColor: currentEditionData.color }}
+              />
+            ) : (
+              <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-white/70 transition-all duration-200 group-hover:w-full" />
+            )}
+          </a>
+          <a
+            href="#rendimiento"
+            className={`uppercase tracking-[0.16em] transition-all duration-200 py-1.5 relative group ${
+              activeSection === 'rendimiento'
+                ? 'text-white font-bold'
+                : 'text-zinc-400 hover:text-white font-medium'
+            }`}
+          >
+          //TODO: Elimina rendimiento del header
+            {activeSection === 'rendimiento' ? (
+              <span
+                className="absolute bottom-0 left-0 w-full h-[2px] rounded-full transition-colors duration-300"
+                style={{ backgroundColor: currentEditionData.color }}
+              />
+            ) : (
+              <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-white/70 transition-all duration-200 group-hover:w-full" />
+            )}
           </a>
           <button
             id="nav-customize-btn"
             onClick={() => setIsCustomizeOpen(true)}
-            className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="uppercase tracking-[0.16em] text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer py-1.5 relative group"
           >
-            Customize
+            <span>Personalizar</span>
+            <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-white/70 transition-all duration-200 group-hover:w-full" />
           </button>
           <button
             id="nav-contacts-btn"
             onClick={() => setIsContactOpen(true)}
-            className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="uppercase tracking-[0.16em] text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer py-1.5 relative group"
           >
-            Contacts
+            <span>Contacto</span>
+            <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-white/70 transition-all duration-200 group-hover:w-full" />
           </button>
         </nav>
 
         {/* Right Actions: User Profile & Cart */}
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <button
             id="user-profile-btn"
             onClick={() => setIsUserModalOpen(true)}
-            className="p-2 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
             aria-label="Perfil de usuario"
           >
-            <User className="w-5 h-5" />
+            <User className="w-4 h-4" />
           </button>
 
           <button
             id="open-cart-btn"
             onClick={() => setIsCartOpen(true)}
-            className="p-2 text-zinc-400 hover:text-white transition-colors cursor-pointer relative"
+            className="w-10 h-10 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95 relative group"
             aria-label="Carrito de compras"
           >
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform" />
             {totalCartItems > 0 && (
               <span
                 id="cart-count-badge"
-                className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#00c2ff] text-zinc-950 text-[10px] font-black flex items-center justify-center animate-scale"
+                style={{ backgroundColor: currentEditionData.color }}
+                className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full text-zinc-950 text-[10px] font-black flex items-center justify-center animate-scale transition-colors duration-300 shadow-md font-mono"
               >
                 {totalCartItems}
               </span>
@@ -310,41 +375,56 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           <button
             id="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-zinc-400 hover:text-white cursor-pointer"
+            className="w-10 h-10 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex md:hidden items-center justify-center cursor-pointer active:scale-95"
             aria-label="Menú"
           >
-            <Menu className="w-5 h-5" />
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         </div>
       </header>
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="fixed top-16 left-0 w-full bg-zinc-950/95 border-b border-zinc-800 p-6 flex flex-col gap-4 z-30 md:hidden backdrop-blur-xl">
+        <div className="fixed top-[68px] sm:top-[74px] left-0 w-full bg-zinc-950/95 border-b border-white/10 p-6 flex flex-col gap-3.5 z-30 md:hidden backdrop-blur-2xl shadow-2xl animate-in slide-in-from-top-2 duration-200">
           <a
-            href="#ediciones"
+            href="#ingenieria"
             onClick={() => setMobileMenuOpen(false)}
-            className="text-xs uppercase tracking-widest text-[#ff5500] font-bold py-2"
+            className={`text-xs uppercase tracking-widest py-2.5 transition-colors border-b border-white/5 ${
+              activeSection === 'ingenieria'
+                ? 'text-white font-bold'
+                : 'text-zinc-300 hover:text-white font-medium'
+            }`}
           >
-            Products
+            Ingeniería
+          </a>
+          <a
+            href="#rendimiento"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`text-xs uppercase tracking-widest py-2.5 transition-colors border-b border-white/5 ${
+              activeSection === 'rendimiento'
+                ? 'text-white font-bold'
+                : 'text-zinc-300 hover:text-white font-medium'
+            }`}
+          >
+            Rendimiento
           </a>
           <button
             onClick={() => {
               setMobileMenuOpen(false);
               setIsCustomizeOpen(true);
             }}
-            className="text-left text-xs uppercase tracking-widest text-zinc-300 hover:text-[#00c2ff] py-2 cursor-pointer"
+            className="text-left text-xs uppercase tracking-widest text-zinc-300 hover:text-white py-2.5 cursor-pointer font-medium border-b border-white/5"
           >
-            Customize
+            Personalizar
           </button>
           <button
             onClick={() => {
               setMobileMenuOpen(false);
               setIsContactOpen(true);
             }}
-            className="text-left text-xs uppercase tracking-widest text-zinc-300 hover:text-[#00c2ff] py-2 cursor-pointer"
+            className="text-left text-xs uppercase tracking-widest text-zinc-300 hover:text-white py-2.5 cursor-pointer font-medium"
           >
-            Contacts
+            Contacto
           </button>
         </div>
       )}
@@ -363,7 +443,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
               <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white text-white ml-0.5 group-hover:scale-110 transition-transform" />
             </button>
             <div className="text-left text-[11px] sm:text-xs font-medium text-zinc-300 leading-tight">
-              Promotion<br />video
+              Video<br />promocional
             </div>
           </div>
         </div>
@@ -397,18 +477,23 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           <div className="hidden md:grid grid-cols-3 items-end w-full">
             {/* Bottom Left: Price & Size */}
             <div className="flex flex-col items-start justify-end">
-              <div className="text-4xl lg:text-5xl font-mono font-normal text-[#00c2ff] tracking-tight leading-none">
+              <div
+                id="hero-price-display"
+                className="text-4xl lg:text-5xl font-mono font-normal tracking-tight leading-none transition-colors duration-300"
+                style={{ color: currentEditionData.color }}
+              >
                 ${currentEditionData.price.toFixed(2)}
               </div>
               <div className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mt-2">
-                SIZE: <span className="text-white">29.5"</span> • OFFICIAL
+                TALLA: <span className="text-white">29.5"</span> • OFICIAL
               </div>
-              <button
-                onClick={() => setLang((l) => (l === 'ru' ? 'en' : l === 'en' ? 'es' : 'ru'))}
-                className="text-xs text-zinc-500 hover:text-white font-semibold mt-3 tracking-wider uppercase transition-colors cursor-pointer"
-              >
-                {lang === 'ru' ? 'Ru' : lang === 'en' ? 'En' : 'Es'}
-              </button>
+              <div className="text-xs text-zinc-500 font-semibold mt-3 tracking-wider uppercase flex items-center gap-1.5">
+                <span
+                  className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
+                  style={{ backgroundColor: currentEditionData.color }}
+                />
+                <span>ESPAÑOL</span>
+              </div>
             </div>
 
             {/* Bottom Center: ADD TO CART Button */}
@@ -417,7 +502,11 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                 id="hero-add-to-cart-btn"
                 onClick={() => addToCart(edition)}
                 disabled={isShooting}
-                className="px-12 lg:px-16 py-3.5 lg:py-4 bg-[#00c2ff] hover:bg-[#38bdf8] active:scale-95 text-black font-black text-xs lg:text-sm tracking-widest uppercase rounded-md shadow-2xl shadow-[#00c2ff]/40 transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: currentEditionData.color,
+                  boxShadow: `0 18px 36px -8px ${currentEditionData.glow || `${currentEditionData.color}50`}`,
+                }}
+                className="px-12 lg:px-16 py-3.5 lg:py-4 active:scale-95 text-black font-black text-xs lg:text-sm tracking-widest uppercase rounded-md transition-all duration-300 cursor-pointer whitespace-nowrap flex items-center justify-center gap-2 hover:brightness-110"
               >
                 {isShooting ? (
                   <>
@@ -425,13 +514,37 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                     <span>¡LANZANDO AL ARO! 🏀</span>
                   </>
                 ) : (
-                  <span>ADD TO CART</span>
+                  <span>AÑADIR AL CARRITO</span>
                 )}
               </button>
             </div>
 
-            {/* Bottom Right: Prev / Next Navigation Arrows */}
+            {/* Bottom Right: Prev / Next Navigation Arrows & Quick Edition Switcher */}
             <div className="flex items-center justify-end gap-3 pb-1">
+              <div className="flex items-center gap-1.5 mr-2">
+                {EDITIONS_LIST.map((item) => {
+                  const isActive = item.id === edition;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => onSelectEdition(item.id)}
+                      aria-label={`Seleccionar edición ${item.name}`}
+                      className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border transition-all cursor-pointer text-[10px] font-bold uppercase tracking-wider"
+                      style={{
+                        borderColor: isActive ? item.color : 'rgba(255,255,255,0.12)',
+                        backgroundColor: isActive ? `${item.color}25` : 'rgba(10,10,12,0.6)',
+                        color: isActive ? '#ffffff' : '#a1a1aa',
+                      }}
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full transition-transform group-hover:scale-125"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="hidden xl:inline">{item.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
               <button
                 id="prev-edition-btn"
                 onClick={handlePrevEdition}
@@ -452,14 +565,44 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
           </div>
 
           {/* Mobile Screen Layout (< md) */}
-          <div className="md:hidden flex flex-col items-center text-center gap-6 w-full pb-2">
+          <div className="md:hidden flex flex-col items-center text-center gap-5 w-full pb-2">
+            {/* Quick edition switch chips for mobile */}
+            <div className="flex items-center justify-center gap-1.5 flex-wrap">
+              {EDITIONS_LIST.map((item) => {
+                const isActive = item.id === edition;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onSelectEdition(item.id)}
+                    aria-label={`Seleccionar edición ${item.name}`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer text-[10px] font-bold uppercase tracking-wider"
+                    style={{
+                      borderColor: isActive ? item.color : 'rgba(255,255,255,0.12)',
+                      backgroundColor: isActive ? `${item.color}25` : 'rgba(10,10,12,0.6)',
+                      color: isActive ? '#ffffff' : '#71717a',
+                    }}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span>{item.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Centered Price and Size */}
             <div className="flex flex-col items-center">
-              <div className="text-4xl sm:text-5xl font-mono font-normal text-[#00c2ff] tracking-tight leading-none">
+              <div
+                id="mobile-hero-price-display"
+                className="text-4xl sm:text-5xl font-mono font-normal tracking-tight leading-none transition-colors duration-300"
+                style={{ color: currentEditionData.color }}
+              >
                 ${currentEditionData.price.toFixed(2)}
               </div>
               <div className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mt-2">
-                SIZE: <span className="text-white">29.5"</span> • OFFICIAL
+                TALLA: <span className="text-white">29.5"</span> • OFICIAL
               </div>
             </div>
 
@@ -468,7 +611,11 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
               id="mobile-hero-add-to-cart-btn"
               onClick={() => addToCart(edition)}
               disabled={isShooting}
-              className="w-full py-4 bg-[#00c2ff] hover:bg-[#38bdf8] active:scale-[0.98] text-black font-black text-xs tracking-widest uppercase rounded-lg shadow-xl shadow-[#00c2ff]/35 transition-all cursor-pointer text-center flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: currentEditionData.color,
+                boxShadow: `0 14px 28px -6px ${currentEditionData.glow || `${currentEditionData.color}40`}`,
+              }}
+              className="w-full py-4 active:scale-[0.98] text-black font-black text-xs tracking-widest uppercase rounded-lg transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2 hover:brightness-110"
             >
               {isShooting ? (
                 <>
@@ -476,7 +623,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                   <span>¡LANZANDO AL ARO! 🏀</span>
                 </>
               ) : (
-                <span>ADD TO CART</span>
+                <span>AÑADIR AL CARRITO</span>
               )}
             </button>
           </div>
@@ -491,9 +638,15 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
       {/* Right Vertical Rail Indicator (as seen in the reference screenshot) */}
       <div className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 hidden md:flex flex-col items-center gap-3 pointer-events-none z-20">
         <div className="w-[1px] h-14 bg-zinc-800 relative">
-          <div className="w-[2px] h-5 bg-[#00c2ff] absolute top-1 -left-[0.5px]" />
+          <div
+            className="w-[2px] h-5 absolute top-1 -left-[0.5px] transition-colors duration-300"
+            style={{ backgroundColor: currentEditionData.color }}
+          />
         </div>
-        <span className="text-[10px] font-bold text-[#00c2ff] tracking-widest [writing-mode:vertical-lr] rotate-180">
+        <span
+          className="text-[10px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 transition-colors duration-300"
+          style={{ color: currentEditionData.color }}
+        >
           90/10
         </span>
       </div>
@@ -568,80 +721,6 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
         </div>
       </section>
 
-      {/* Section 3: EDICIONES / COLECCIÓN */}
-      <section id="ediciones" className="min-h-screen w-full flex flex-col items-center justify-center px-6 py-20">
-        <div className="section-animate max-w-3xl w-full text-center mb-10">
-          <h2 className="font-display text-5xl sm:text-7xl font-black text-white uppercase tracking-tight">
-            Colección Pro
-          </h2>
-          <p className="text-zinc-400 text-xs sm:text-sm mt-1">
-            Selecciona para previsualizar en 3D o añade directamente a tu carrito:
-          </p>
-        </div>
-
-        <div className="section-animate grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full">
-          {EDITIONS_LIST.map((item) => {
-            const isSelected = edition === item.id;
-            return (
-              <div
-                key={item.id}
-                id={`card-${item.id}`}
-                onClick={() => onSelectEdition(item.id)}
-                className={`p-5 rounded-2xl border transition-all duration-300 text-left relative overflow-hidden backdrop-blur-lg cursor-pointer ${
-                  isSelected
-                    ? 'bg-zinc-900/90 border-[#ff5722] ring-1 ring-[#ff5722]/50 shadow-xl shadow-[#ff5722]/10'
-                    : 'bg-zinc-950/70 border-zinc-800 hover:border-zinc-700'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                    {item.subtitle}
-                  </span>
-                  <span className="text-sm font-black text-white font-mono">
-                    ${item.price.toFixed(2)} USD
-                  </span>
-                </div>
-
-                <h3 className="text-2xl font-bold font-display uppercase tracking-wide text-white mb-1">
-                  {item.bgText} {item.name}
-                </h3>
-                <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
-                  {item.desc}
-                </p>
-
-                <div className="flex items-center gap-2 pt-3 border-t border-zinc-800">
-                  <button
-                    id={`view-3d-${item.id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectEdition(item.id);
-                    }}
-                    className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1 cursor-pointer ${
-                      isSelected
-                        ? 'bg-white/10 text-white'
-                        : 'bg-zinc-900 text-zinc-400 hover:text-white'
-                    }`}
-                  >
-                    <Rotate3d className="w-3.5 h-3.5 text-[#ff5722]" /> 3D
-                  </button>
-
-                  <button
-                    id={`add-btn-${item.id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCart(item.id);
-                    }}
-                    className="flex-1 py-1.5 bg-[#ff5722] hover:bg-white text-zinc-950 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" /> Carrito
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
       {/* Section 4: Final Minimal CTA */}
       <section className="min-h-[60vh] w-full flex flex-col items-center justify-center px-6 text-center py-20 relative">
         <div className="section-animate max-w-xl">
@@ -669,12 +748,12 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
       <footer className="w-full bg-zinc-950 border-t border-zinc-900 px-6 py-8 text-center text-xs text-zinc-500">
         <div className="flex items-center justify-center gap-4 mb-2">
           <span className="font-black tracking-widest uppercase text-white">
-            SLAM DUNK
+            TUKU
           </span>
           <span className="text-zinc-700">•</span>
-          <span>Official 29.5" Basketball Equipment</span>
+          <span>Equipamiento Oficial de Baloncesto 29.5"</span>
         </div>
-        <p>© {new Date().getFullYear()} SLAM DUNK. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} TUKU. Todos los derechos reservados.</p>
       </footer>
 
       {/* MODAL: Promotion Video Modal */}
@@ -692,7 +771,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
             <div className="flex items-center gap-2 mb-4">
               <span className="w-2.5 h-2.5 rounded-full bg-[#ff5722] animate-pulse" />
               <h3 className="font-display text-2xl font-black uppercase text-white tracking-wide">
-                SLAM DUNK — Official Promo Showcase
+                TUKU — Muestra Oficial en Video
               </h3>
             </div>
 
@@ -701,7 +780,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 flex flex-col justify-between p-6">
                 <div className="flex justify-between items-center text-xs text-zinc-400">
                   <span className="font-bold text-white uppercase tracking-wider">
-                    Model: {currentEditionData.bgText} 29.5" Official
+                    Modelo: {currentEditionData.bgText} 29.5" Oficial
                   </span>
                   <span className="px-2 py-0.5 rounded bg-red-600/30 text-red-400 font-mono text-[10px] font-bold uppercase">
                     HD 4K 60FPS
@@ -713,7 +792,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                     <Play className="w-6 h-6 fill-white ml-1" />
                   </div>
                   <p className="text-white text-base font-bold uppercase tracking-wider mb-1">
-                    Precision In Motion
+                    Precisión en Movimiento
                   </p>
                   <p className="text-zinc-400 text-xs max-w-xs">
                     Test de impacto balístico, calibración de canales 0.8mm y rebote elástico sobre duela profesional.
@@ -734,7 +813,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
             </div>
 
             <div className="mt-4 flex items-center justify-between text-xs text-zinc-400">
-              <span>Tamaño Reglamentario NBA: 29.5 pulgadas (75 cm)</span>
+              <span>Tamaño Reglamentario Oficial: 29.5 pulgadas (75 cm)</span>
               <button
                 onClick={() => {
                   setIsPromoVideoOpen(false);
@@ -764,11 +843,11 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
             <div className="flex items-center gap-2 mb-2">
               <Sliders className="w-5 h-5 text-[#ff5722]" />
               <h3 className="font-display text-2xl font-black uppercase text-white tracking-wide">
-                Personalización Custom
+                Personalización a Medida
               </h3>
             </div>
             <p className="text-xs text-zinc-400 mb-5">
-              Configura las especificaciones a medida para tu balón SLAM DUNK:
+              Configura las especificaciones a medida para tu balón TUKU:
             </p>
 
             <div className="space-y-4 text-xs">
@@ -798,7 +877,7 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
                   Textura de Piel
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {['Pebbled Pro', 'Asphalt Grip', 'Soft Court'].map((tex) => (
+                  {['Granulado Pro', 'Agarre Asfalto', 'Cancha Suave'].map((tex) => (
                     <button
                       key={tex}
                       onClick={() => setCustomTexture(tex)}
@@ -985,10 +1064,10 @@ export function Overlay({ edition, onSelectEdition }: OverlayProps) {
               </div>
               <div>
                 <h3 className="font-display text-2xl font-black uppercase text-white leading-tight">
-                  SLAM Member
+                  Miembro TUKU
                 </h3>
                 <span className="text-[11px] text-[#ff5722] font-semibold uppercase tracking-wider">
-                  Pro Baller Tier
+                  Nivel Baloncestista Pro
                 </span>
               </div>
             </div>

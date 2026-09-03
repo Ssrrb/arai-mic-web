@@ -11,6 +11,8 @@ export interface BallModelInfo {
   price: number;
   size: string;
   color: string;
+  accentHover?: string;
+  glow?: string;
   specChannel: string;
   bounceRate: string;
 }

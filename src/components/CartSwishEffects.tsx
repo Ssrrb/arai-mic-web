@@ -95,22 +95,6 @@ export function CartSwishEffects() {
         });
       }
 
-      // 5. Generate floating "+1 SWISH!" badge
-      const newBadgeId = Date.now();
-      const newBadge: FloatingBadge = {
-        id: newBadgeId,
-        edition,
-        text: '+1 SWISH! 🏀',
-        color: accentColor,
-        x: targetX,
-        y: targetY + 14,
-      };
-      setBadges((prev) => [...prev, newBadge]);
-
-      setTimeout(() => {
-        setBadges((prev) => prev.filter((b) => b.id !== newBadgeId));
-      }, 1500);
-
       // 6. Spawn burst of celebratory spark particles
       const newSparks: SwishSpark[] = [];
       const sparkCount = 14;
@@ -134,9 +118,9 @@ export function CartSwishEffects() {
       }, 700);
     };
 
-    window.addEventListener('slam-dunk:ball-landed', handleBallLanded);
+    window.addEventListener('tuku:ball-landed', handleBallLanded);
     return () => {
-      window.removeEventListener('slam-dunk:ball-landed', handleBallLanded);
+      window.removeEventListener('tuku:ball-landed', handleBallLanded);
     };
   }, []);
 

@@ -161,7 +161,7 @@ function SceneController({ edition }: SceneControllerProps) {
 
     // Dispatch custom event to notify UI that ball swished into cart
     window.dispatchEvent(
-      new CustomEvent('slam-dunk:ball-landed', {
+      new CustomEvent('tuku:ball-landed', {
         detail: { edition: landedEdition },
       })
     );
@@ -175,9 +175,9 @@ function SceneController({ edition }: SceneControllerProps) {
       handleThrow(targetEd);
     };
 
-    window.addEventListener('slam-dunk:throw-ball', onThrowEvent);
+    window.addEventListener('tuku:throw-ball', onThrowEvent);
     return () => {
-      window.removeEventListener('slam-dunk:throw-ball', onThrowEvent);
+      window.removeEventListener('tuku:throw-ball', onThrowEvent);
     };
   }, [edition, handleThrow]);
 

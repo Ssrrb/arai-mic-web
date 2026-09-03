@@ -1,6 +1,6 @@
 {
-  "name": "SLAM DUNK - Official 29.5\" Basketball Equipment",
-  "description": "Interactive 3D showcase and store for SLAM DUNK official 29.5\" basketball editions.",
+  "name": "TUKU - Balones Oficiales de Baloncesto 29.5\"",
+  "description": "Showcase interactivo en 3D y tienda oficial de balones de baloncesto TUKU de 29.5\".",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

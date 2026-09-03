@@ -156,6 +156,47 @@ export function getBasketballTextures(edition: BallEdition = 'nebula'): Textures
         ctx.stroke();
       }
     }
+
+    // 4. Stamped TUKU Brand Logo on front panel
+    const stampX = w * 0.375;
+    const stampY = h * 0.5;
+
+    ctx.save();
+    ctx.font = '900 64px "Bebas Neue", Anton, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle =
+      edition === 'oro'
+        ? '#ffffff'
+        : edition === 'fuego'
+        ? '#18181b'
+        : edition === 'metal'
+        ? '#f1f5f9'
+        : '#ffffff';
+    ctx.fillText('TUKU', stampX, stampY - 20);
+
+    ctx.font = '700 18px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle =
+      edition === 'oro'
+        ? '#d97706'
+        : edition === 'fuego'
+        ? '#27272a'
+        : edition === 'metal'
+        ? '#94a3b8'
+        : '#00d4ff';
+    ctx.fillText('OFICIAL 29.5', stampX, stampY + 28);
+    ctx.restore();
+
+    // Stamped indentation on bump map
+    bumpCtx.save();
+    bumpCtx.font = '900 64px "Bebas Neue", Anton, sans-serif';
+    bumpCtx.textAlign = 'center';
+    bumpCtx.textBaseline = 'middle';
+    bumpCtx.fillStyle = '#ffffff';
+    bumpCtx.fillText('TUKU', stampX, stampY - 20);
+    bumpCtx.font = '700 18px "Plus Jakarta Sans", sans-serif';
+    bumpCtx.fillText('OFICIAL 29.5', stampX, stampY + 28);
+    bumpCtx.restore();
   }
 
   const diffTex = new CanvasTexture(canvas);
