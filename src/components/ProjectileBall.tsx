@@ -140,8 +140,8 @@ export function ProjectileBall({
     <group ref={groupRef}>
       {/* 3D Flying Basketball */}
       <Basketball
-        edition={edition === 'custom' ? 'fuego' : edition}
-        customConfig={customConfig}
+        edition={edition === 'custom' ? 'nebula' : edition}
+        customConfig={edition === 'custom' ? customConfig : undefined}
         scale={1}
         autoRotate={false}
       />

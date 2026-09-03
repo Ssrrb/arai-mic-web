@@ -224,8 +224,12 @@ function SceneController({
         edition?: BallEdition | 'custom';
         customConfig?: CustomBallConfig;
       }>;
-      const targetEd = customEvent.detail?.edition || (viewMode === 'customizer' ? 'custom' : edition);
-      const conf = customEvent.detail?.customConfig || customConfig;
+      const targetEd =
+        customEvent.detail?.edition || (viewMode === 'customizer' ? 'custom' : edition);
+      const conf =
+        targetEd === 'custom'
+          ? customEvent.detail?.customConfig || customConfig
+          : undefined;
       handleThrow(targetEd, conf);
     };
 
