@@ -4,9 +4,6 @@ import {
   Sparkles,
   Check,
   ShoppingBag,
-  Volume2,
-  VolumeX,
-  RotateCcw,
   Sliders,
   Type,
   Send,
@@ -24,11 +21,7 @@ interface CustomizerPageProps {
   onAddToCart: () => void;
   cartCount: number;
   onOpenCart: () => void;
-  isMuted: boolean;
-  onToggleMute: () => void;
   isShooting: boolean;
-  autoRotate: boolean;
-  onToggleAutoRotate: () => void;
   onResetRotation: () => void;
 }
 
@@ -129,11 +122,7 @@ export function CustomizerPage({
   onAddToCart,
   cartCount,
   onOpenCart,
-  isMuted,
-  onToggleMute,
   isShooting,
-  autoRotate,
-  onToggleAutoRotate,
   onResetRotation,
 }: CustomizerPageProps) {
   const [vibePrompt, setVibePrompt] = useState('');
@@ -205,82 +194,75 @@ export function CustomizerPage({
 
   return (
     <div className="relative z-30 w-full min-h-screen text-white flex flex-col pointer-events-none">
-      {/* Top Floating Bar for Customizer */}
-      <header className="fixed top-0 left-0 w-full px-5 sm:px-8 lg:px-12 py-3.5 flex justify-between items-center z-40 backdrop-blur-md bg-zinc-950/40 border-b border-white/[0.05] pointer-events-auto">
+      {/* Shared storefront header, adapted for the TUKU Lab workspace */}
+      <header className="fixed top-0 left-0 w-full px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center z-40 backdrop-blur-xl bg-zinc-950/75 border-b border-white/[0.08] text-white transition-all duration-300 pointer-events-auto">
         <button
-          id="customizer-back-btn"
+          id="customizer-brand-btn"
           onClick={() => {
             playButtonClick('nav');
             onBackToShop();
           }}
-          className="flex items-center gap-2.5 text-zinc-400 hover:text-white group transition-colors cursor-pointer text-xs font-semibold tracking-wider uppercase"
+          className="flex items-center gap-3 sm:gap-3.5 group cursor-pointer text-left focus:outline-none"
+          aria-label="Volver a la tienda TUKU"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Volver a la tienda</span>
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/30 group-hover:border-white/80 flex items-center justify-center relative overflow-hidden transition-all duration-300 bg-white/[0.04] group-hover:bg-white/[0.08] shadow-[0_0_20px_rgba(255,255,255,0.06)] group-hover:shadow-[0_0_25px_rgba(255,255,255,0.15)] group-hover:scale-105">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-full h-[1.5px] bg-white/60 group-hover:bg-white transition-colors" />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-full w-[1.5px] bg-white/60 group-hover:bg-white transition-colors" />
+            </div>
+            <div className="absolute w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-white/20 group-hover:border-white/50 transition-colors" />
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <span className="font-headline text-2xl sm:text-3xl lg:text-[32px] tracking-[0.22em] font-black uppercase text-white leading-none drop-shadow-sm">
+              TUKU
+            </span>
+            <span className="hidden xs:inline-flex text-[9px] sm:text-[10px] uppercase font-black tracking-[0.18em] text-[#ff5722] bg-[#ff5722]/10 px-2 py-1 rounded-full border border-[#ff5722]/30 shadow-[0_0_18px_rgba(255,87,34,0.08)]">
+              Lab
+            </span>
+          </div>
         </button>
 
-        {/* Brand center emblem */}
-        <div className="flex items-center gap-2">
-          <span className="font-headline text-2xl tracking-[0.25em] font-black uppercase text-white leading-none drop-shadow-sm">
-            TUKU
-          </span>
-          <span className="text-[10px] uppercase font-bold tracking-widest text-[#ff5722] bg-[#ff5722]/10 px-2 py-0.5 rounded-full border border-[#ff5722]/30">
-            Lab
-          </span>
-        </div>
-
-        {/* Right tools: 3D auto-rotate toggle, audio toggle, and cart */}
-        <div className="flex items-center gap-2.5">
+        <nav className="hidden md:flex items-center gap-8 lg:gap-11 text-xs font-semibold tracking-wider" aria-label="Navegación del laboratorio">
           <button
+            id="customizer-back-btn"
             onClick={() => {
-              playButtonClick('subtle');
-              onToggleAutoRotate();
+              playButtonClick('nav');
+              onBackToShop();
             }}
-            className={`w-9 h-9 rounded-full border transition-all flex items-center justify-center cursor-pointer ${
-              autoRotate
-                ? 'border-[#ff5722]/50 bg-[#ff5722]/15 text-[#ff5722]'
-                : 'border-white/10 bg-white/[0.03] text-zinc-400 hover:text-white'
-            }`}
-            title={autoRotate ? 'Pausar auto-rotación' : 'Activar auto-rotación 3D'}
-            aria-label={autoRotate ? 'Pausar rotación automática 3D' : 'Activar rotación automática 3D'}
+            className="flex items-center gap-2 uppercase tracking-[0.16em] text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer py-1.5 relative group"
           >
-            <RotateCcw className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+            <span>Tienda</span>
+            <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-white/70 transition-all duration-200 group-hover:w-full" />
           </button>
+          <span className="uppercase tracking-[0.16em] text-white font-bold py-1.5 relative">
+            Personalizar
+            <span className="absolute bottom-0 left-0 w-full h-[2px] rounded-full bg-[#ff5722]" />
+          </span>
+        </nav>
 
-          <button
-            onClick={() => {
-              playButtonClick('subtle');
-              onToggleMute();
-            }}
-            className="w-9 h-9 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
-            aria-label={isMuted ? 'Activar sonido' : 'Silenciar sonido'}
-            title={isMuted ? 'Activar sonido' : 'Silenciar sonido'}
-          >
-            {isMuted ? <VolumeX className="w-4 h-4 text-zinc-500" /> : <Volume2 className="w-4 h-4 text-[#ff5722]" />}
-          </button>
-
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <button
             id="open-cart-btn"
             onClick={() => {
               playButtonClick('nav');
               onOpenCart();
             }}
-            className="relative flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.04] hover:bg-white/[0.09] text-white transition-all duration-200 cursor-pointer"
-            aria-label="Ver Carrito de Compras"
+            className="w-10 h-10 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95 relative group"
+            aria-label="Ver carrito de compras"
           >
-            <ShoppingBag className="w-4 h-4 text-[#ff5722]" />
-            <span className="text-xs font-bold font-mono">
-              {cartCount > 0 ? (
-                <span
-                  id="cart-count-badge"
-                  className="bg-[#ff5722] text-white text-[10px] font-black px-1.5 py-0.5 rounded-full inline-block min-w-[18px] text-center"
-                >
-                  {cartCount}
-                </span>
-              ) : (
-                <span className="text-zinc-400">0</span>
-              )}
-            </span>
+            <ShoppingBag className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            {cartCount > 0 && (
+              <span
+                id="cart-count-badge"
+                className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#ff5722] text-white text-[10px] font-black flex items-center justify-center shadow-md font-mono"
+              >
+                {cartCount}
+              </span>
+            )}
           </button>
         </div>
       </header>

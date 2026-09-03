@@ -250,11 +250,7 @@ export default function App() {
               playModalOpenSound();
               setIsCartOpen(true);
             }}
-            isMuted={isMuted}
-            onToggleMute={handleToggleMute}
             isShooting={isShooting}
-            autoRotate={autoRotate}
-            onToggleAutoRotate={() => setAutoRotate((prev) => !prev)}
             onResetRotation={handleResetRotation}
           />
         )}
