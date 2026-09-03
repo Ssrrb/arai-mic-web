@@ -422,22 +422,6 @@ export function Overlay({
 
         {/* Right Actions: Audio Toggle, User Profile & Cart */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Audio Feedback Controller */}
-          <button
-            id="audio-toggle-btn"
-            data-sound-custom="true"
-            onClick={onToggleMute}
-            className="w-10 h-10 rounded-full border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all flex items-center justify-center cursor-pointer active:scale-95"
-            aria-label={isMuted ? 'Activar sonido de botones' : 'Silenciar sonido de botones'}
-            title={isMuted ? 'Activar sonido de botones' : 'Silenciar sonido de botones'}
-          >
-            {isMuted ? (
-              <VolumeX className="w-4 h-4 text-zinc-500" />
-            ) : (
-              <Volume2 className="w-4 h-4 text-[#ff5722]" />
-            )}
-          </button>
-
           <button
             id="user-profile-btn"
             onClick={() => {

@@ -308,10 +308,10 @@ export function CustomizerPage({
 
               {/* Big, powerful headline from reference */}
               <h1 className="font-headline font-black text-4xl sm:text-5xl lg:text-[54px] uppercase tracking-tight text-white leading-[0.92] drop-shadow-md">
-                DESIGN YOUR LEGACY
+                CREA TU LEGADO
               </h1>
               <p className="text-zinc-400 text-sm mt-2 font-medium">
-                Create a ball that matches your game.
+                Una pelota hecha para vos.
               </p>
             </div>
 
@@ -458,62 +458,6 @@ export function CustomizerPage({
                   );
                 })}
               </div>
-            </div>
-
-            {/* SECTION 4: AI TEXTURE LAB - With orange accent border and sparkle */}
-            <div className="border border-[#ff5722]/50 bg-gradient-to-b from-[#ff5722]/[0.06] to-zinc-950/80 rounded-xl p-4 sm:p-5 relative overflow-hidden space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[#ff5722]">
-                  <span className="text-[11px] font-black uppercase tracking-[0.2em]">
-                    AI TEXTURE LAB
-                  </span>
-                </div>
-                <Sparkles className="w-4 h-4 text-[#ff5722]" />
-              </div>
-
-              {/* Vibe Prompt Input / Textarea */}
-              <div className="relative">
-                <textarea
-                  rows={2}
-                  value={vibePrompt}
-                  onChange={(e) => setVibePrompt(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && vibePrompt.trim()) {
-                      e.preventDefault();
-                      handleApplyVibe(vibePrompt);
-                    }
-                  }}
-                  placeholder='Describe a vibe (e.g. "Cyberpunk neon tiger" or "90s Miami Vice")'
-                  className="w-full bg-zinc-950/90 border border-zinc-800 focus:border-[#ff5722] rounded-lg p-3 text-xs text-white placeholder:text-zinc-600 focus:outline-none transition-colors resize-none leading-relaxed"
-                />
-              </div>
-
-              {/* Quick Vibe Preset Chips */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {AI_VIBES.map((v) => (
-                  <button
-                    key={v.name}
-                    onClick={() => {
-                      setVibePrompt(v.vibe);
-                      handleApplyVibe(v.vibe);
-                    }}
-                    className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 hover:border-[#ff5722]/60 text-zinc-400 hover:text-white transition-all cursor-pointer"
-                  >
-                    {v.name}
-                  </button>
-                ))}
-              </div>
-
-              {vibePrompt.trim() && (
-                <button
-                  onClick={() => handleApplyVibe(vibePrompt)}
-                  disabled={isApplyingVibe}
-                  className="w-full py-2 bg-[#ff5722]/20 hover:bg-[#ff5722]/30 border border-[#ff5722]/50 text-[#ff5722] hover:text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isApplyingVibe ? 'Generando Vibe...' : 'Aplicar Textura Vibe'}</span>
-                </button>
-              )}
             </div>
 
             {/* SECTION 5: LASER ENGRAVING (Custom laser text stamped in 3D) */}
