@@ -29,6 +29,7 @@ import { EDITIONS_LIST } from '../data/editions';
 import { CartItem } from '../types';
 import { WhatsAppCheckoutModal } from './WhatsAppCheckoutModal';
 import { CartDrawer } from './CartDrawer';
+import { TukuLogo } from './TukuLogo';
 import {
   playButtonClick,
   playEditionSound,
@@ -354,26 +355,7 @@ export function Overlay({
           className="flex items-center gap-3.5 group cursor-pointer text-left focus:outline-none"
           aria-label="Ir al inicio de TUKU"
         >
-          {/* Refined Basketball Emblem */}
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/30 group-hover:border-white/80 flex items-center justify-center relative overflow-hidden transition-all duration-300 bg-white/[0.04] group-hover:bg-white/[0.08] shadow-[0_0_20px_rgba(255,255,255,0.06)] group-hover:shadow-[0_0_25px_rgba(255,255,255,0.15)] group-hover:scale-105">
-            {/* Center horizontal seam */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full h-[1.5px] bg-white/60 group-hover:bg-white transition-colors" />
-            </div>
-            {/* Center vertical seam */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-full w-[1.5px] bg-white/60 group-hover:bg-white transition-colors" />
-            </div>
-            {/* Curved channel ellipse */}
-            <div className="absolute w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-white/20 group-hover:border-white/50 transition-colors" />
-          </div>
-
-          {/* Prominent, authoritative TUKU wordmark */}
-          <div className="flex flex-col">
-            <span className="font-headline text-2xl sm:text-3xl lg:text-[32px] tracking-[0.22em] font-black uppercase text-white leading-none group-hover:text-white transition-colors drop-shadow-sm">
-              TUKU
-            </span> 
-          </div>
+          <TukuLogo size={42} showWordmark tagline="X Arai" idPrefix="overlay-nav" />
         </button>
 
         {/* Center Navigation - Normal neutral styling by default */}
@@ -560,7 +542,7 @@ export function Overlay({
                 {formatPYG(currentEditionData.price)}
               </div>
               <div className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mt-2">
-                TALLA: <span className="text-white">29.5"</span> • OFICIAL
+                EDICIÓN: <span className="text-white">OFICIAL</span> • DESARROLLADA POR ARAI
               </div>
               <div className="text-xs text-zinc-500 font-semibold mt-3 tracking-wider uppercase flex items-center gap-1.5">
               </div>
@@ -679,7 +661,7 @@ export function Overlay({
                 {formatPYG(currentEditionData.price)}
               </div>
               <div className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mt-2">
-                TALLA: <span className="text-white">29.5"</span> • OFICIAL
+                EDICIÓN: <span className="text-white">OFICIAL</span> • DESARROLLADA POR ARAI
               </div>
             </div>
 
@@ -813,7 +795,7 @@ export function Overlay({
             DOMINA LA DUELA
           </h2>
           <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto">
-            Balón oficial reglamentario 29.5" con despacho express directo a tu puerta y atención por WhatsApp.
+            Pelota deportiva desarrollada por Arai para jóvenes emprendedores, con despacho express directo a tu puerta y atención por WhatsApp.
           </p>
 
           <button
@@ -831,14 +813,15 @@ export function Overlay({
 
       {/* Minimal Footer */}
       <footer className="w-full bg-zinc-950 border-t border-zinc-900 px-6 py-8 text-center text-xs text-zinc-500">
-        <div className="flex items-center justify-center gap-4 mb-2">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-2">
+          <TukuLogo size={28} idPrefix="footer-logo" />
           <span className="font-black tracking-widest uppercase text-white">
             TUKU
           </span>
-          <span className="text-zinc-700">•</span>
-          <span>Equipamiento Oficial de Baloncesto 29.5"</span>
+          <span className="hidden sm:inline text-zinc-700">•</span>
+          <span>Pelota deportiva desarrollada por Arai para jóvenes emprendedores</span>
         </div>
-        <p>© {new Date().getFullYear()} TUKU. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} TUKU por Arai. Todos los derechos reservados.</p>
       </footer>
 
       {/* MODAL: Promotion Video Modal */}
@@ -868,7 +851,7 @@ export function Overlay({
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 flex flex-col justify-between p-6">
                 <div className="flex justify-between items-center text-xs text-zinc-400">
                   <span className="font-bold text-white uppercase tracking-wider">
-                    Modelo: {currentEditionData.bgText} 29.5" Oficial
+                    Modelo: {currentEditionData.bgText} • Pelota Deportiva por Arai
                   </span>
                   <span className="px-2 py-0.5 rounded bg-red-600/30 text-red-400 font-mono text-[10px] font-bold uppercase">
                     HD 4K 60FPS
@@ -901,7 +884,7 @@ export function Overlay({
             </div>
 
             <div className="mt-4 flex items-center justify-between text-xs text-zinc-400">
-              <span>Tamaño Reglamentario Oficial: 29.5 pulgadas (75 cm)</span>
+              <span>Pelota deportiva desarrollada por Arai • Para jóvenes emprendedores</span>
               <button
                 onClick={() => {
                   setIsPromoVideoOpen(false);
@@ -1048,7 +1031,7 @@ export function Overlay({
                   Miembro TUKU
                 </h3>
                 <span className="text-[11px] text-[#ff5722] font-semibold uppercase tracking-wider">
-                  Nivel Baloncestista Pro
+                  Joven Emprendedor Deportivo
                 </span>
               </div>
             </div>

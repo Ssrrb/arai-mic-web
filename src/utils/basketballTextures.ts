@@ -221,38 +221,58 @@ export function getCustomBasketballTextures(config: CustomBallConfig): TexturesR
     const subColor = isBrightBase ? '#52525b' : '#ff5722';
 
     ctx.save();
-    ctx.font = '900 46px "Bebas Neue", Anton, sans-serif';
+    // Draw circular blue emblem badge with orange TUKU letters
+    const emblemRadius = 38;
+    ctx.beginPath();
+    ctx.arc(stampX, stampY - 16, emblemRadius, 0, Math.PI * 2);
+    ctx.fillStyle = '#0066d6';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#004aa3';
+    ctx.stroke();
+
+    // Orange letters TUKU
+    ctx.font = '900 28px "Plus Jakarta Sans", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = stampColor;
-    ctx.fillText('TUKU LAB', stampX, stampY - 18);
+    ctx.fillStyle = '#ff6f00';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 2;
+    ctx.fillText('TUKU', stampX, stampY - 15);
+    ctx.shadowColor = 'transparent';
 
-    ctx.font = '700 13px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '700 12px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle = subColor;
-    ctx.fillText('CUSTOM EDITION 29.5', stampX, stampY + 16);
+    ctx.fillText('CUSTOM • POR ARAI', stampX, stampY + 34);
 
     // Custom Laser Engraved Text
     if (config.laserText && config.laserText.trim()) {
-      ctx.font = '800 15px "Plus Jakarta Sans", sans-serif';
+      ctx.font = '800 14px "Plus Jakarta Sans", sans-serif';
       ctx.fillStyle = stampColor;
-      ctx.fillText(config.laserText.trim().toUpperCase(), stampX, stampY + 36);
+      ctx.fillText(config.laserText.trim().toUpperCase(), stampX, stampY + 54);
     }
     ctx.restore();
 
     // Stamped indentation on bump map
     bumpCtx.save();
-    bumpCtx.font = '900 46px "Bebas Neue", Anton, sans-serif';
+    bumpCtx.beginPath();
+    bumpCtx.arc(stampX, stampY - 16, emblemRadius, 0, Math.PI * 2);
+    bumpCtx.fillStyle = '#c0c0c0';
+    bumpCtx.fill();
+
+    bumpCtx.font = '900 28px "Plus Jakarta Sans", sans-serif';
     bumpCtx.textAlign = 'center';
     bumpCtx.textBaseline = 'middle';
     bumpCtx.fillStyle = '#ffffff';
-    bumpCtx.fillText('TUKU LAB', stampX, stampY - 18);
+    bumpCtx.fillText('TUKU', stampX, stampY - 15);
 
-    bumpCtx.font = '700 13px "Plus Jakarta Sans", sans-serif';
-    bumpCtx.fillText('CUSTOM EDITION 29.5', stampX, stampY + 16);
+    bumpCtx.font = '700 12px "Plus Jakarta Sans", sans-serif';
+    bumpCtx.fillText('CUSTOM • POR ARAI', stampX, stampY + 34);
 
     if (config.laserText && config.laserText.trim()) {
-      bumpCtx.font = '800 15px "Plus Jakarta Sans", sans-serif';
-      bumpCtx.fillText(config.laserText.trim().toUpperCase(), stampX, stampY + 36);
+      bumpCtx.font = '800 14px "Plus Jakarta Sans", sans-serif';
+      bumpCtx.fillText(config.laserText.trim().toUpperCase(), stampX, stampY + 54);
     }
     bumpCtx.restore();
   }
@@ -426,40 +446,54 @@ export function getBasketballTextures(edition: BallEdition = 'nebula'): Textures
     const stampY = h * 0.5;
 
     ctx.save();
-    ctx.font = '900 64px "Bebas Neue", Anton, sans-serif';
+    // Circular blue badge emblem
+    const badgeRadius = 42;
+    ctx.beginPath();
+    ctx.arc(stampX, stampY - 14, badgeRadius, 0, Math.PI * 2);
+    ctx.fillStyle = '#0066d6';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#00479e';
+    ctx.stroke();
+
+    // Vibrant Orange TUKU Typography
+    ctx.font = '900 32px "Plus Jakarta Sans", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle =
-      edition === 'oro'
-        ? '#ffffff'
-        : edition === 'fuego'
-        ? '#18181b'
-        : edition === 'metal'
-        ? '#f1f5f9'
-        : '#ffffff';
-    ctx.fillText('TUKU', stampX, stampY - 20);
+    ctx.fillStyle = '#ff6f00';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetY = 2;
+    ctx.fillText('TUKU', stampX, stampY - 13);
+    ctx.shadowColor = 'transparent';
 
-    ctx.font = '700 18px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '700 15px "Plus Jakarta Sans", sans-serif';
     ctx.fillStyle =
       edition === 'oro'
-        ? '#d97706'
+        ? '#fbbf24'
         : edition === 'fuego'
-        ? '#27272a'
+        ? '#ff5722'
         : edition === 'metal'
-        ? '#94a3b8'
-        : '#00d4ff';
-    ctx.fillText('OFICIAL 29.5', stampX, stampY + 28);
+        ? '#cbd5e1'
+        : '#38bdf8';
+    ctx.fillText('POR ARAI', stampX, stampY + 42);
     ctx.restore();
 
     // Stamped indentation on bump map
     bumpCtx.save();
-    bumpCtx.font = '900 64px "Bebas Neue", Anton, sans-serif';
+    bumpCtx.beginPath();
+    bumpCtx.arc(stampX, stampY - 14, badgeRadius, 0, Math.PI * 2);
+    bumpCtx.fillStyle = '#c5c5c5';
+    bumpCtx.fill();
+
+    bumpCtx.font = '900 32px "Plus Jakarta Sans", sans-serif';
     bumpCtx.textAlign = 'center';
     bumpCtx.textBaseline = 'middle';
     bumpCtx.fillStyle = '#ffffff';
-    bumpCtx.fillText('TUKU', stampX, stampY - 20);
-    bumpCtx.font = '700 18px "Plus Jakarta Sans", sans-serif';
-    bumpCtx.fillText('OFICIAL 29.5', stampX, stampY + 28);
+    bumpCtx.fillText('TUKU', stampX, stampY - 13);
+
+    bumpCtx.font = '700 15px "Plus Jakarta Sans", sans-serif';
+    bumpCtx.fillText('POR ARAI', stampX, stampY + 42);
     bumpCtx.restore();
   }
 

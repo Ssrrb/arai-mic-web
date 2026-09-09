@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { CustomBallConfig, GripTextureType } from '../types';
 import { playButtonClick, playAddToCartLaunchSound } from '../utils/audio';
+import { TukuLogo } from './TukuLogo';
 
 export const FIXED_CUSTOM_PRICE = 360000;
 
@@ -205,24 +206,7 @@ export function CustomizerPage({
           className="flex items-center gap-3 sm:gap-3.5 group cursor-pointer text-left focus:outline-none"
           aria-label="Volver a la tienda TUKU"
         >
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/30 group-hover:border-white/80 flex items-center justify-center relative overflow-hidden transition-all duration-300 bg-white/[0.04] group-hover:bg-white/[0.08] shadow-[0_0_20px_rgba(255,255,255,0.06)] group-hover:shadow-[0_0_25px_rgba(255,255,255,0.15)] group-hover:scale-105">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full h-[1.5px] bg-white/60 group-hover:bg-white transition-colors" />
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-full w-[1.5px] bg-white/60 group-hover:bg-white transition-colors" />
-            </div>
-            <div className="absolute w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-white/20 group-hover:border-white/50 transition-colors" />
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            <span className="font-headline text-2xl sm:text-3xl lg:text-[32px] tracking-[0.22em] font-black uppercase text-white leading-none drop-shadow-sm">
-              TUKU
-            </span>
-            <span className="hidden xs:inline-flex text-[9px] sm:text-[10px] uppercase font-black tracking-[0.18em] text-[#ff5722] bg-[#ff5722]/10 px-2 py-1 rounded-full border border-[#ff5722]/30 shadow-[0_0_18px_rgba(255,87,34,0.08)]">
-              Lab
-            </span>
-          </div>
+          <TukuLogo size={42} showWordmark tagline="Lab" idPrefix="customizer-nav" />
         </button>
 
         <nav className="hidden md:flex items-center gap-8 lg:gap-11 text-xs font-semibold tracking-wider" aria-label="Navegación del laboratorio">
@@ -289,7 +273,7 @@ export function CustomizerPage({
                 CREA TU LEGADO
               </h1>
               <p className="text-zinc-400 text-sm mt-2 font-medium">
-                Una pelota hecha para vos.
+                Pelota deportiva desarrollada por Arai, diseñada para jóvenes emprendedores.
               </p>
             </div>
 

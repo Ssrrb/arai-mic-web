@@ -158,7 +158,7 @@ export default function App() {
         : 'Moleteado Cross';
 
     const customId = `custom-${customConfig.baseColor}-${customConfig.lineColor}-${customConfig.textureType}-${customConfig.laserText || 'none'}`;
-    const customName = `TUKU Custom Lab 29.5" (${textureLabel})`;
+    const customName = `TUKU Custom Lab (${textureLabel})`;
 
     setCart((prev) => {
       const existing = prev.find((item) => item.id === customId);

@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- 3D Blue Sphere / Cushion Gradients -->
+    <radialGradient id="tukuBlueCushion" cx="38%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#3b9df8" />
+      <stop offset="35%" stop-color="#0e7ee6" />
+      <stop offset="75%" stop-color="#0060cb" />
+      <stop offset="100%" stop-color="#003e8c" />
+    </radialGradient>
+
+    <!-- Top Highlight Sheen on the Cushion -->
+    <radialGradient id="tukuTopSheen" cx="50%" cy="15%" r="45%">
+      <stop offset="0%" stop-color="rgba(255, 255, 255, 0.45)" />
+      <stop offset="60%" stop-color="rgba(255, 255, 255, 0.05)" />
+      <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+    </radialGradient>
+
+    <!-- Orange 3D Letter Gradient -->
+    <linearGradient id="tukuOrangeFront" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff912a" />
+      <stop offset="45%" stop-color="#ff6f00" />
+      <stop offset="100%" stop-color="#e65100" />
+    </linearGradient>
+
+    <!-- 3D Extrusion Side / Shadow Color -->
+    <linearGradient id="tukuOrangeDepth" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#bf360c" />
+      <stop offset="100%" stop-color="#871a00" />
+    </linearGradient>
+
+    <!-- Pillow indentation shadow behind orange letters -->
+    <filter id="cushionIndentation" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#002b66" flood-opacity="0.65" />
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00183b" flood-opacity="0.8" />
+    </filter>
+
+    <!-- 3D Letter Shadow -->
+    <filter id="letterShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#7a1f00" flood-opacity="0.75" />
+      <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#00224f" flood-opacity="0.55" />
+    </filter>
+  </defs>
+
+  <!-- Blue Circular Cushion Background -->
+  <circle cx="250" cy="250" r="236" fill="url(#tukuBlueCushion)" />
+  <!-- Gloss / Highlight Layer -->
+  <circle cx="250" cy="250" r="236" fill="url(#tukuTopSheen)" />
+
+  <!-- Soft organic cushion crease / indentations around TUKU text -->
+  <g filter="url(#cushionIndentation)">
+    <ellipse cx="250" cy="265" rx="195" ry="70" fill="#004da6" opacity="0.35" filter="blur(8px)" />
+  </g>
+
+  <!-- 3D Extruded Depth for "TUKU" Letters (Shadow / Side layers) -->
+  <g filter="url(#letterShadow)">
+    <!-- 3D Bevel Stems shifted downwards to create the extruded depth -->
+    <!-- Letter T - Depth -->
+    <path d="M 72 216 Q 72 204 84 204 L 148 204 Q 160 204 160 216 Q 160 228 148 228 L 126 228 L 126 298 Q 126 312 116 312 Q 106 312 106 298 L 106 228 L 84 228 Q 72 228 72 216 Z" 
+          transform="translate(0, 7)" fill="url(#tukuOrangeDepth)" />
+
+    <!-- Letter U - Depth -->
+    <path d="M 174 216 Q 174 204 186 204 Q 198 204 198 216 L 198 274 Q 198 296 214 296 Q 230 296 230 274 L 230 216 Q 230 204 242 204 Q 254 204 254 216 L 254 274 Q 254 314 214 314 Q 174 314 174 274 Z" 
+          transform="translate(0, 7)" fill="url(#tukuOrangeDepth)" />
+
+    <!-- Letter K - Depth -->
+    <path d="M 270 216 Q 270 204 282 204 Q 294 204 294 216 L 294 298 Q 294 312 282 312 Q 270 312 270 298 Z
+             M 292 258 L 334 214 Q 343 205 352 214 Q 361 223 352 232 L 314 272 L 354 300 Q 363 306 357 317 Q 351 324 341 318 L 292 284 Z" 
+          transform="translate(0, 7)" fill="url(#tukuOrangeDepth)" />
+
+    <!-- Letter U (Second) - Depth -->
+    <path d="M 374 216 Q 374 204 386 204 Q 398 204 398 216 L 398 274 Q 398 296 414 296 Q 430 296 430 274 L 430 216 Q 430 204 442 204 Q 454 204 454 216 L 454 274 Q 454 314 414 314 Q 374 314 374 274 Z" 
+          transform="translate(0, 7)" fill="url(#tukuOrangeDepth)" />
+  </g>
+
+  <!-- Vibrant Orange Front Face of Letters "TUKU" -->
+  <g>
+    <!-- Letter T -->
+    <path d="M 72 216 Q 72 204 84 204 L 148 204 Q 160 204 160 216 Q 160 228 148 228 L 126 228 L 126 298 Q 126 312 116 312 Q 106 312 106 298 L 106 228 L 84 228 Q 72 228 72 216 Z" 
+          fill="url(#tukuOrangeFront)" />
+    <!-- T top highlight -->
+    <path d="M 86 208 L 146 208" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Letter U -->
+    <path d="M 174 216 Q 174 204 186 204 Q 198 204 198 216 L 198 274 Q 198 296 214 296 Q 230 296 230 274 L 230 216 Q 230 204 242 204 Q 254 204 254 216 L 254 274 Q 254 314 214 314 Q 174 314 174 274 Z" 
+          fill="url(#tukuOrangeFront)" />
+    <!-- U top caps highlight -->
+    <ellipse cx="186" cy="207" rx="6" ry="2.5" fill="rgba(255,255,255,0.45)" />
+    <ellipse cx="242" cy="207" rx="6" ry="2.5" fill="rgba(255,255,255,0.45)" />
+
+    <!-- Letter K -->
+    <path d="M 270 216 Q 270 204 282 204 Q 294 204 294 216 L 294 298 Q 294 312 282 312 Q 270 312 270 298 Z
+             M 292 258 L 334 214 Q 343 205 352 214 Q 361 223 352 232 L 314 272 L 354 300 Q 363 306 357 317 Q 351 324 341 318 L 292 284 Z" 
+          fill="url(#tukuOrangeFront)" />
+    <ellipse cx="282" cy="207" rx="6" ry="2.5" fill="rgba(255,255,255,0.45)" />
+
+    <!-- Letter U (Second) -->
+    <path d="M 374 216 Q 374 204 386 204 Q 398 204 398 216 L 398 274 Q 398 296 414 296 Q 430 296 430 274 L 430 216 Q 430 204 442 204 Q 454 204 454 216 L 454 274 Q 454 314 414 314 Q 374 314 374 274 Z" 
+          fill="url(#tukuOrangeFront)" />
+    <ellipse cx="386" cy="207" rx="6" ry="2.5" fill="rgba(255,255,255,0.45)" />
+    <ellipse cx="442" cy="207" rx="6" ry="2.5" fill="rgba(255,255,255,0.45)" />
+  </g>
+</svg>

@@ -1,6 +1,6 @@
 {
-  "name": "TUKU - Balones Oficiales de Baloncesto 29.5\"",
-  "description": "Showcase interactivo en 3D y tienda oficial de balones de baloncesto TUKU de 29.5\".",
+  "name": "TUKU - Pelota Deportiva por Arai",
+  "description": "TUKU es una pelota deportiva desarrollada por Arai, dirigida para jóvenes emprendedores.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
