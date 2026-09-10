@@ -13,7 +13,7 @@ import { CustomBallConfig, GripTextureType } from '../types';
 import { playButtonClick, playAddToCartLaunchSound } from '../utils/audio';
 import { TukuLogo } from './TukuLogo';
 
-export const FIXED_CUSTOM_PRICE = 360000;
+export const FIXED_CUSTOM_PRICE = 35000;
 
 interface CustomizerPageProps {
   config: CustomBallConfig;
@@ -41,7 +41,7 @@ const BASE_COLORS = [
 const LINE_COLORS = [
   { id: 'black', label: 'Negro Profundo', hex: '#111111' },
   { id: 'white', label: 'Blanco Nieve', hex: '#ffffff' },
-  { id: 'gold', label: 'Oro Campeonato', hex: '#f59e0b' },
+  { id: 'gold', label: 'Oro Zen', hex: '#f59e0b' },
   { id: 'lime', label: 'Verde Lima', hex: '#4ade80' },
   { id: 'cyan', label: 'Cian Neón', hex: '#00f0ff' },
 ];
@@ -55,26 +55,26 @@ const GRIP_TEXTURES: {
   {
     id: 'classic',
     label: 'CLÁSICA',
-    sub: 'Microgranulado NBA',
-    desc: 'Textura de micrograno oficial para canchas profesionales techadas.',
+    sub: 'Microgranulado Suave',
+    desc: 'Textura de micrograno agradable al tacto para masajear y relajar la mano.',
   },
   {
     id: 'street',
-    label: 'CALLEJERA',
-    sub: 'Asfalto Furtivo',
-    desc: 'Compuesto abrasivo ultra-rugoso para máximo agarre en cemento y asfalto.',
+    label: 'SENSORIAL',
+    sub: 'Relieve Antiestrés',
+    desc: 'Compuesto texturado para estimulación sensorial y disipación de tensión muscular.',
   },
   {
     id: 'tech',
     label: 'TÉCNICA',
-    sub: 'Matriz Hexagonal',
-    desc: 'Estructura aeroespacial en panal de abeja con disipación de humedad.',
+    sub: 'Matriz Hexagonal Ergo',
+    desc: 'Estructura ergonómica en panal para distribución uniforme de la presión al apretar.',
   },
   {
     id: 'cross',
-    label: 'CRUZADA',
-    sub: 'Moleteado Diamante',
-    desc: 'Patrón cruzado tipo moleteado olímpico para control biomecánico total.',
+    label: 'RELAJANTE',
+    sub: 'Puntos Acupresión',
+    desc: 'Patrón cruzado que estimula la circulación y relaja dedos y muñecas.',
   },
 ];
 
@@ -101,11 +101,11 @@ const AI_VIBES = [
     vibe: 'Magma volcánico caliente con canales de obsidiana',
   },
   {
-    name: 'Golden Trophy',
+    name: 'Golden Zen',
     base: '#ffffff',
     line: '#f59e0b',
     texture: 'cross' as GripTextureType,
-    vibe: 'Trofeo de campeonato de oro y marfil',
+    vibe: 'Zen relajante de oro y marfil',
   },
   {
     name: 'Midnight Stealth',
@@ -261,7 +261,7 @@ export function CustomizerPage({
           {/* On mobile, reserve a clear viewport for the 3D ball before the controls. */}
           <div className="h-[42svh] min-h-[300px] md:hidden shrink-0 flex items-end justify-center pb-5" aria-hidden="true">
             <span className="text-[10px] uppercase tracking-[0.16em] text-zinc-400 bg-black/45 backdrop-blur-md border border-white/10 rounded-full px-3 py-1.5">
-              Deslizá sobre el balón para rotarlo
+              Deslizá sobre la pelotita para rotarla
             </span>
           </div>
 
@@ -270,10 +270,10 @@ export function CustomizerPage({
             <div>
               {/* Big, powerful headline from reference */}
               <h1 className="font-headline font-black text-4xl sm:text-5xl lg:text-[54px] uppercase tracking-tight text-white leading-[0.92] drop-shadow-md">
-                CREA TU LEGADO
+                LIBERA TU ENERGÍA
               </h1>
               <p className="text-zinc-400 text-sm mt-2 font-medium">
-                Pelota deportiva desarrollada por Arai, diseñada para jóvenes emprendedores.
+                Pelotita anti-estrés desarrollada por Arai, diseñada para jóvenes emprendedores.
               </p>
             </div>
 
@@ -333,7 +333,7 @@ export function CustomizerPage({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                  COLOR DE LÍNEAS
+                  COLOR DE CANALES
                 </span>
                 <span className="text-[11px] font-mono text-zinc-500 uppercase">
                   {config.lineColor}
@@ -365,7 +365,7 @@ export function CustomizerPage({
 
                 {/* Custom Line Color Input Trigger */}
                 <label
-                  title="Color de líneas personalizado"
+                  title="Color de canales personalizado"
                   className="w-8 h-8 rounded-full border border-dashed border-zinc-600 hover:border-white flex items-center justify-center cursor-pointer transition-all hover:scale-105 relative bg-zinc-900/60"
                 >
                   <Sliders className="w-3 h-3 text-zinc-400 hover:text-white" />
@@ -385,7 +385,7 @@ export function CustomizerPage({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                  TEXTURA DE AGARRE
+                  TEXTURA ERGONÓMICA
                 </span>
                 <span className="text-[11px] font-semibold text-[#ff5722] uppercase">
                   {GRIP_TEXTURES.find((texture) => texture.id === config.textureType)?.label}
@@ -441,13 +441,13 @@ export function CustomizerPage({
                   const val = e.target.value;
                   onChangeConfig((prev) => ({ ...prev, laserText: val }));
                 }}
-                placeholder="Ej: KOBE #24 o TU NOMBRE"
+                placeholder="Ej: CALMA, FOCUS o TU NOMBRE"
                 className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#ff5722] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 focus:outline-none uppercase font-mono tracking-wider transition-colors"
               />
             </div>
           </div>
 
-          {/* Sticky Bottom CTA Button - Fixed Price 360.000 Gs matching reference */}
+          {/* Sticky Bottom CTA Button - Fixed Price matching reference */}
           <div className="pt-6 mt-6 border-t border-white/[0.08] space-y-2">
             <div className="flex justify-between items-baseline mb-1">
               <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
@@ -483,7 +483,7 @@ export function CustomizerPage({
         <div className="hidden lg:flex fixed bottom-8 right-12 z-20 items-center gap-3 bg-zinc-950/75 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 pointer-events-auto select-none shadow-xl">
           <div className="w-2 h-2 rounded-full bg-[#ff5722] animate-pulse" />
           <span className="text-xs text-zinc-300 font-medium">
-            Haz clic y arrastra sobre el balón para rotar 360° en 3D
+            Haz clic y arrastra sobre la pelotita para rotar 360° en 3D
           </span>
           <button
             onClick={onResetRotation}

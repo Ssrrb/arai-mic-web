@@ -1,6 +1,6 @@
 {
-  "name": "TUKU - Pelota Deportiva por Arai",
-  "description": "TUKU es una pelota deportiva desarrollada por Arai, dirigida para jóvenes emprendedores.",
+  "name": "TUKU - Pelotita Anti-Estrés por Arai",
+  "description": "TUKU es una pelotita anti-estrés ergonómica desarrollada por Arai, diseñada para jóvenes emprendedores para liberar tensiones y potenciar el enfoque.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

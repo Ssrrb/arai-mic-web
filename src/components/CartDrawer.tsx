@@ -3,6 +3,7 @@ import { ShoppingBag, X, Plus, Minus, Trash2, Send, Sparkles } from 'lucide-reac
 import { CartItem } from '../types';
 import { BallEdition } from './Basketball';
 import { EDITIONS_LIST } from '../data/editions';
+import { FIXED_CUSTOM_PRICE } from './CustomizerPage';
 import { playModalCloseSound } from '../utils/audio';
 
 interface CartDrawerProps {
@@ -73,7 +74,7 @@ export function CartDrawer({
               </div>
               <p className="text-sm font-bold text-white mb-1">Tu carrito está vacío</p>
               <p className="text-xs text-zinc-400 mb-6">
-                Personaliza tu balón a medida o añade una de nuestras ediciones oficiales:
+                Personaliza tu pelotita anti-estrés a medida o añade una de nuestras ediciones oficiales:
               </p>
 
               <div className="space-y-3">
@@ -86,7 +87,7 @@ export function CartDrawer({
                     className="w-full py-3 px-4 bg-gradient-to-r from-[#ff5722] to-[#e64a19] hover:from-[#f4511e] hover:to-[#ff5722] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#ff5722]/20"
                   >
                     <Sparkles className="w-4 h-4" />
-                    <span>Personalizar Mi Balón (₲ 360.000)</span>
+                    <span>Personalizar Mi Pelotita ({formatPYG(FIXED_CUSTOM_PRICE)})</span>
                   </button>
                 )}
 
@@ -101,7 +102,7 @@ export function CartDrawer({
                 )}
 
                 <div className="pt-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                  Ediciones Colección Oficial
+                  Ediciones Anti-Estrés Oficiales
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">

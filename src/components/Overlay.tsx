@@ -130,7 +130,7 @@ export function Overlay({
       const landedEdition = customEvent.detail?.edition || edition;
       const itemData = EDITIONS_LIST.find((item) => item.id === landedEdition) || EDITIONS_LIST[0];
 
-      showToast(`🏀 ¡SWISH! ${itemData.bgText} encestado en el carrito`);
+      showToast(`✨ ¡Tensión disipada! ${itemData.bgText} añadida al carrito`);
 
       // Punch cart count badge with GSAP
       const badge = document.getElementById('cart-count-badge');
@@ -184,7 +184,7 @@ export function Overlay({
       ];
     });
 
-    showToast(`🏀 ${itemData.bgText} añadido al carrito (${formatPYG(itemData.price)})`);
+    showToast(`✨ ${itemData.bgText} añadida al carrito (${formatPYG(itemData.price)})`);
 
     // 1. GSAP button tactile press & spring bounce
     const activeBtn = document.activeElement as HTMLElement | null;
@@ -469,7 +469,7 @@ export function Overlay({
             }}
             className="text-left text-xs uppercase tracking-widest text-zinc-300 hover:text-white py-2.5 cursor-pointer font-medium border-b border-white/5"
           >
-            Personalizar (360.000 Gs)
+            Personalizar (35.000 Gs)
           </button>
           <button
             onClick={() => {
@@ -510,7 +510,7 @@ export function Overlay({
           <button
             id="mobile-prev-edition-btn"
             onClick={handlePrevEdition}
-            aria-label="Balón anterior"
+            aria-label="Pelotita anterior"
             className="w-11 h-11 rounded-full border border-zinc-700/80 bg-zinc-950/90 hover:bg-zinc-800 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-xl"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -518,14 +518,14 @@ export function Overlay({
           <button
             id="mobile-next-edition-btn"
             onClick={handleNextEdition}
-            aria-label="Balón siguiente"
+            aria-label="Pelotita siguiente"
             className="w-11 h-11 rounded-full border border-zinc-700/80 bg-zinc-950/90 hover:bg-zinc-800 text-white flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-xl"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Center Space: The 3D basketball floats here */}
+        {/* Center Space: The 3D ball floats here */}
         <div className="flex-1 min-h-[140px] pointer-events-none" />
 
         {/* Bottom Bar: Responsive across mobile, tablet, and desktop */}
@@ -542,7 +542,7 @@ export function Overlay({
                 {formatPYG(currentEditionData.price)}
               </div>
               <div className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mt-2">
-                EDICIÓN: <span className="text-white">OFICIAL</span> • DESARROLLADA POR ARAI
+                EDICIÓN: <span className="text-white">ANTI-ESTRÉS</span> • DESARROLLADA POR ARAI
               </div>
               <div className="text-xs text-zinc-500 font-semibold mt-3 tracking-wider uppercase flex items-center gap-1.5">
               </div>
@@ -563,7 +563,7 @@ export function Overlay({
                 {isShooting ? (
                   <>
                     <Sparkles className="w-4 h-4 animate-spin text-black" />
-                    <span>¡LANZANDO AL ARO! 🏀</span>
+                    <span>¡AÑADIENDO! ✨</span>
                   </>
                 ) : (
                   <>
@@ -605,7 +605,7 @@ export function Overlay({
               <button
                 id="prev-edition-btn"
                 onClick={handlePrevEdition}
-                aria-label="Balón anterior"
+                aria-label="Pelotita anterior"
                 className="w-12 h-12 rounded-full border border-zinc-700/80 bg-zinc-950/80 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -613,7 +613,7 @@ export function Overlay({
               <button
                 id="next-edition-btn"
                 onClick={handleNextEdition}
-                aria-label="Balón siguiente"
+                aria-label="Pelotita siguiente"
                 className="w-12 h-12 rounded-full border border-zinc-700/80 bg-zinc-950/80 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-90"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -661,7 +661,7 @@ export function Overlay({
                 {formatPYG(currentEditionData.price)}
               </div>
               <div className="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mt-2">
-                EDICIÓN: <span className="text-white">OFICIAL</span> • DESARROLLADA POR ARAI
+                EDICIÓN: <span className="text-white">ANTI-ESTRÉS</span> • DESARROLLADA POR ARAI
               </div>
             </div>
 
@@ -680,7 +680,7 @@ export function Overlay({
                 {isShooting ? (
                   <>
                     <Sparkles className="w-4 h-4 animate-spin text-black" />
-                    <span>¡LANZANDO! 🏀</span>
+                    <span>¡AÑADIENDO! ✨</span>
                   </>
                 ) : (
                   <>
@@ -719,23 +719,23 @@ export function Overlay({
       <section id="ingenieria" className="min-h-screen w-full flex items-center justify-start px-6 md:px-24 py-20">
         <div className="section-animate max-w-md bg-zinc-950/80 p-6 sm:p-8 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#ff5722] bg-[#ff5722]/10 mb-3">
-            <Zap className="w-3 h-3" /> Superficie
+            <Zap className="w-3 h-3" /> Ergonomía Táctil
           </div>
           <h2 className="font-display text-4xl sm:text-6xl font-bold mb-3 text-white uppercase leading-none">
             Ingeniería
           </h2>
           <p className="text-zinc-300 text-sm mb-6 leading-relaxed">
-            Microtextura de grano profundo con canales de 0.8 mm para un agarre consistente bajo cualquier condición de juego.
+            Microtextura sensorial suave con canales ergonómicos de 0.8 mm diseñados para aliviar la tensión de la mano y potenciar el enfoque en tu escritorio.
           </p>
 
           <div className="grid grid-cols-2 gap-3 mb-6">
             <div className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800">
               <span className="block text-2xl font-black font-display text-white">{currentEditionData.specChannel}</span>
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Canales</span>
+              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Canales Ergo</span>
             </div>
             <div className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800">
               <span className="block text-2xl font-black font-display text-emerald-400">100%</span>
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Hermético</span>
+              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Anti-Fatiga</span>
             </div>
           </div>
 
@@ -756,23 +756,23 @@ export function Overlay({
       <section id="rendimiento" className="min-h-screen w-full flex items-center justify-end px-6 md:px-24 py-20">
         <div className="section-animate max-w-md text-right bg-zinc-950/80 p-6 sm:p-8 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#f59e0b] bg-[#f59e0b]/10 mb-3 justify-end">
-            <Sparkles className="w-3 h-3" /> Core™ Reactor
+            <Sparkles className="w-3 h-3" /> Soft-Squeeze™ Core
           </div>
           <h2 className="font-display text-4xl sm:text-6xl font-bold mb-3 text-white uppercase leading-none">
-            Respuesta
+            Alivio & Enfoque
           </h2>
           <p className="text-zinc-300 text-sm mb-6 leading-relaxed">
-            Núcleo reactivo que maximiza el retorno elástico y mantiene la esfericidad tras miles de impactos intensos.
+            Núcleo viscoelástico de alta resistencia que absorbe el estrés diario, previene la fatiga articular y recupera su forma esférica perfecta.
           </p>
 
           <div className="grid grid-cols-2 gap-3 mb-6 text-left">
             <div className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800">
               <span className="block text-2xl font-black font-display text-[#ff5722]">{currentEditionData.bounceRate}</span>
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Retorno</span>
+              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Recuperación</span>
             </div>
             <div className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800">
-              <span className="block text-2xl font-black font-display text-white">99.4%</span>
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Esfericidad</span>
+              <span className="block text-2xl font-black font-display text-white">50.000+</span>
+              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Compresiones</span>
             </div>
           </div>
 
@@ -792,10 +792,10 @@ export function Overlay({
       <section className="min-h-[60vh] w-full flex flex-col items-center justify-center px-6 text-center py-20 relative">
         <div className="section-animate max-w-xl">
           <h2 className="font-display text-6xl sm:text-8xl font-black mb-4 text-white uppercase tracking-tighter">
-            DOMINA LA DUELA
+            LIBERA EL ESTRÉS
           </h2>
           <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto">
-            Pelota deportiva desarrollada por Arai para jóvenes emprendedores, con despacho express directo a tu puerta y atención por WhatsApp.
+            Pelotita anti-estrés desarrollada por Arai para jóvenes emprendedores, con despacho express directo a tu puerta y atención por WhatsApp.
           </p>
 
           <button
@@ -819,7 +819,7 @@ export function Overlay({
             TUKU
           </span>
           <span className="hidden sm:inline text-zinc-700">•</span>
-          <span>Pelota deportiva desarrollada por Arai para jóvenes emprendedores</span>
+          <span>Pelotita anti-estrés desarrollada por Arai para jóvenes emprendedores</span>
         </div>
         <p>© {new Date().getFullYear()} TUKU por Arai. Todos los derechos reservados.</p>
       </footer>
@@ -851,7 +851,7 @@ export function Overlay({
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 flex flex-col justify-between p-6">
                 <div className="flex justify-between items-center text-xs text-zinc-400">
                   <span className="font-bold text-white uppercase tracking-wider">
-                    Modelo: {currentEditionData.bgText} • Pelota Deportiva por Arai
+                    Modelo: {currentEditionData.bgText} • Pelotita Anti-Estrés por Arai
                   </span>
                   <span className="px-2 py-0.5 rounded bg-red-600/30 text-red-400 font-mono text-[10px] font-bold uppercase">
                     HD 4K 60FPS
@@ -863,10 +863,10 @@ export function Overlay({
                     <Play className="w-6 h-6 fill-white ml-1" />
                   </div>
                   <p className="text-white text-base font-bold uppercase tracking-wider mb-1">
-                    Precisión en Movimiento
+                    Ergonomía en Movimiento
                   </p>
                   <p className="text-zinc-400 text-xs max-w-xs">
-                    Test de impacto balístico, calibración de canales 0.8mm y rebote elástico sobre duela profesional.
+                    Test de compresión suave, disipación de estrés, canales ergonómicos y retorno viscoelástico para tu escritorio.
                   </p>
                 </div>
 
@@ -884,7 +884,7 @@ export function Overlay({
             </div>
 
             <div className="mt-4 flex items-center justify-between text-xs text-zinc-400">
-              <span>Pelota deportiva desarrollada por Arai • Para jóvenes emprendedores</span>
+              <span>Pelotita anti-estrés desarrollada por Arai • Para jóvenes emprendedores</span>
               <button
                 onClick={() => {
                   setIsPromoVideoOpen(false);
@@ -924,7 +924,7 @@ export function Overlay({
               </h3>
             </div>
             <p className="text-xs text-zinc-400 mb-5">
-              Ponte en contacto con nuestro equipo de ingeniería deportiva:
+              Ponte en contacto con nuestro equipo de bienestar y ergonomía:
             </p>
 
             {contactSent ? (
@@ -1031,7 +1031,7 @@ export function Overlay({
                   Miembro TUKU
                 </h3>
                 <span className="text-[11px] text-[#ff5722] font-semibold uppercase tracking-wider">
-                  Joven Emprendedor Deportivo
+                  Joven Emprendedor • Enfoque & Bienestar
                 </span>
               </div>
             </div>
@@ -1075,7 +1075,7 @@ export function Overlay({
               }}
               className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-colors cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
 
             <h3 className="font-display text-3xl font-black uppercase text-white mb-4">
@@ -1085,19 +1085,19 @@ export function Overlay({
             <div className="space-y-3 text-xs mb-6">
               <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 flex justify-between items-center">
                 <span className="text-zinc-400 font-semibold uppercase">Material Exterior</span>
-                <span className="text-white font-bold">Poliuretano Micro-Pebbled Compuesto</span>
+                <span className="text-white font-bold">Poliuretano Soft-Touch Hipoalergénico</span>
               </div>
               <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 flex justify-between items-center">
-                <span className="text-zinc-400 font-semibold uppercase">Estructura</span>
-                <span className="text-white font-bold">2.400m Bobinado Nylon Pro</span>
+                <span className="text-zinc-400 font-semibold uppercase">Estructura Interior</span>
+                <span className="text-white font-bold">Espuma Viscoelástica Ultra-Densa</span>
               </div>
               <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 flex justify-between items-center">
-                <span className="text-zinc-400 font-semibold uppercase">Cámara</span>
-                <span className="text-white font-bold">Butilo Hermético de Retención</span>
+                <span className="text-zinc-400 font-semibold uppercase">Canales</span>
+                <span className="text-white font-bold">Canales Ergonómicos 0.8 mm de Alivio</span>
               </div>
               <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 flex justify-between items-center">
-                <span className="text-zinc-400 font-semibold uppercase">Presión Nominal</span>
-                <span className="text-white font-bold">7.5 - 8.5 PSI Oficial NBA</span>
+                <span className="text-zinc-400 font-semibold uppercase">Durabilidad</span>
+                <span className="text-white font-bold">50.000+ Compresiones Garantizadas</span>
               </div>
             </div>
 

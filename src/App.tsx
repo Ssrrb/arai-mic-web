@@ -133,7 +133,7 @@ export default function App() {
     [edition]
   );
 
-  // Adding a customized ball from Customizer - Strictly 360.000 GS
+  // Adding a customized ball from Customizer - 35.000 GS
   const handleAddToCartCustom = useCallback(() => {
     setIsShooting(true);
     playAddToCartLaunchSound();
@@ -150,15 +150,15 @@ export default function App() {
 
     const textureLabel =
       customConfig.textureType === 'classic'
-        ? 'Granulado Classic'
+        ? 'Microgranulado Suave'
         : customConfig.textureType === 'street'
-        ? 'Asfalto Rugoso'
+        ? 'Relieve Antiestrés'
         : customConfig.textureType === 'tech'
-        ? 'Hexagonal Tech'
-        : 'Moleteado Cross';
+        ? 'Hexagonal Ergo'
+        : 'Puntos Acupresión';
 
     const customId = `custom-${customConfig.baseColor}-${customConfig.lineColor}-${customConfig.textureType}-${customConfig.laserText || 'none'}`;
-    const customName = `TUKU Custom Lab (${textureLabel})`;
+    const customName = `TUKU Custom Anti-Estrés (${textureLabel})`;
 
     setCart((prev) => {
       const existing = prev.find((item) => item.id === customId);
@@ -173,7 +173,7 @@ export default function App() {
           id: customId,
           edition: 'fuego',
           name: customName,
-          price: FIXED_CUSTOM_PRICE, // STRICTLY 360.000 GS
+          price: FIXED_CUSTOM_PRICE,
           quantity: 1,
           color: customConfig.baseColor,
           customConfig: { ...customConfig },
@@ -213,8 +213,8 @@ export default function App() {
         {/* Background typography behind the 3D ball */}
         <BackgroundTypography
           modelName={view === 'customizer' ? 'CUSTOM' : currentEditionData.bgText}
-          bgLeft={view === 'customizer' ? '360.000 GS' : currentEditionData.bgLeft}
-          bgRight={view === 'customizer' ? 'LAB' : currentEditionData.bgRight}
+          bgLeft={view === 'customizer' ? '35.000 GS' : currentEditionData.bgLeft}
+          bgRight={view === 'customizer' ? 'ERGO' : currentEditionData.bgRight}
           isCustomizer={view === 'customizer'}
         />
 

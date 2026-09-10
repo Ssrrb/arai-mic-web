@@ -78,7 +78,7 @@ export function WhatsAppCheckoutModal({
   // Generación limpia del mensaje para WhatsApp con solamente Envío y Pago Contra Entrega
   const generateWhatsAppMessage = () => {
     const lines: string[] = [];
-    lines.push(`🏀 *NUEVO PEDIDO TUKU #${orderId}*`);
+    lines.push(`✨ *NUEVO PEDIDO TUKU ANTI-ESTRÉS #${orderId}*`);
     lines.push(`━━━━━━━━━━━━━━━━━━━━━`);
     lines.push(`🛒 *PRODUCTOS:*`);
 
@@ -449,7 +449,7 @@ export function WhatsAppCheckoutModal({
                   />
                   {submittedAttempt && !direccion.trim() && (
                     <span className="text-[10px] text-red-400 mt-1 block">
-                      Ingresa la dirección donde llevaremos tu balón.
+                      Ingresa la dirección donde llevaremos tu pelotita anti-estrés.
                     </span>
                   )}
                 </div>
@@ -481,7 +481,7 @@ export function WhatsAppCheckoutModal({
                         Pago Contra Entrega
                       </h5>
                       <span className="text-[10px] text-emerald-400 font-medium">
-                        Pagas al recibir tu balón en la puerta
+                        Pagas al recibir tu pedido en la puerta
                       </span>
                     </div>
                   </div>
