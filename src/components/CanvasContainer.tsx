@@ -54,14 +54,15 @@ function SceneController({
   const isTablet = size.width >= 768 && size.width < 1024;
 
   // Responsive scale tailored to viewport
-  let responsiveScale = 1.18;
+  let responsiveScale = 1.25;
   if (viewMode === 'customizer') {
     responsiveScale = isMobile ? 0.92 : isTablet ? 1.08 : 1.32;
   } else {
-    responsiveScale = isMobile ? 0.78 : isTablet ? 0.96 : 1.18;
+    // Landing view: calibrated for stunning macro details on desktop and high visibility on mobile
+    responsiveScale = isMobile ? 0.88 : isTablet ? 1.05 : 1.28;
   }
 
-  const landingInitialY = isMobile ? 0.98 : 0;
+  const landingInitialY = isMobile ? 0.95 : 0;
   const customizerTargetPos = isMobile
     ? new THREE.Vector3(0, 1.15, 0)
     : isTablet
@@ -283,9 +284,13 @@ function SceneController({
         },
       });
 
-      const rightX = isMobile ? 0.95 : isTablet ? 1.6 : 2.5;
-      const leftX = isMobile ? -0.95 : isTablet ? -1.6 : -2.5;
-      const ballZ = isMobile ? 0.35 : 0.45;
+      // Calibrated positions: on mobile the ball stays beautifully visible within the screen boundaries,
+      // and on desktop it crops on the right edge as seen in the reference editorial layout
+      const rightX = isMobile ? 0.52 : isTablet ? 1.6 : 2.38;
+      const leftX = isMobile ? -0.52 : isTablet ? -1.6 : -2.38;
+      const ballZ = isMobile ? 0.55 : 0.5;
+      const ingY = isMobile ? 0.18 : -0.15;
+      const rendY = isMobile ? 0.12 : 0.15;
 
       // 1. Smoothly move to the RIGHT as the user scrolls out of Hero into Ingeniería
       tl.fromTo(
@@ -293,7 +298,7 @@ function SceneController({
         { x: 0, y: landingInitialY, z: 0 },
         {
           x: rightX,
-          y: isMobile ? -0.2 : -0.25,
+          y: ingY,
           z: ballZ,
           duration: 1.2,
           ease: 'power1.inOut',
@@ -301,8 +306,8 @@ function SceneController({
       )
         // 2. HOLD firmly on the RIGHT throughout the entire Ingeniería section so the text on the left is completely unobstructed!
         .to(groupRef.current!.position, {
-          x: rightX + 0.05,
-          y: isMobile ? -0.25 : -0.3,
+          x: rightX + (isMobile ? 0.02 : 0.04),
+          y: ingY - (isMobile ? 0.04 : 0.06),
           z: ballZ,
           duration: 1.6,
           ease: 'none',
@@ -310,15 +315,15 @@ function SceneController({
         // 3. Move from RIGHT to LEFT towards the Rendimiento section (where text is on the right)
         .to(groupRef.current!.position, {
           x: leftX,
-          y: isMobile ? 0.2 : 0.25,
+          y: rendY,
           z: ballZ,
           duration: 1.4,
           ease: 'power1.inOut',
         })
         // 4. HOLD on the LEFT throughout the Rendimiento section
         .to(groupRef.current!.position, {
-          x: leftX - 0.05,
-          y: isMobile ? 0.25 : 0.3,
+          x: leftX - (isMobile ? 0.02 : 0.04),
+          y: rendY + (isMobile ? 0.04 : 0.06),
           z: ballZ,
           duration: 1.4,
           ease: 'none',
@@ -326,8 +331,8 @@ function SceneController({
         // 5. Center the ball for the final CTA section
         .to(groupRef.current!.position, {
           x: 0,
-          y: isMobile ? 0.05 : 0.05,
-          z: isMobile ? 0.8 : 1.2,
+          y: isMobile ? 0.35 : 0.05,
+          z: isMobile ? 0.75 : 1.2,
           duration: 1.0,
           ease: 'power1.out',
         });

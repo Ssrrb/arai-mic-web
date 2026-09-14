@@ -752,64 +752,266 @@ export function Overlay({
         </span>
       </div>
 
-      {/* Section 1: INGENIERÍA */}
-      <section id="ingenieria" className="min-h-screen w-full flex items-center justify-start px-6 md:px-16 lg:px-24 py-20 relative">
-        <div className="section-animate max-w-md w-full bg-zinc-950/85 p-6 sm:p-8 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl relative z-10 pointer-events-auto">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#ff5722] bg-[#ff5722]/10 mb-3">
-            <Zap className="w-3 h-3" /> Ergonomía Táctil
+      {/* Section 1: INGENIERÍA (Redesigned to match the reference editorial engineering layout) */}
+      <section
+        id="ingenieria"
+        className="min-h-screen w-full flex items-center justify-start relative px-6 md:px-14 lg:px-20 py-24 overflow-hidden select-none"
+      >
+        {/* Subtle architectural CAD/Blueprint grid lines matching reference screenshot */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute left-[33%] top-0 bottom-0 w-[1px] bg-white/[0.04] hidden md:block" />
+          <div className="absolute left-[66%] top-0 bottom-0 w-[1px] bg-white/[0.04] hidden md:block" />
+          <div className="absolute left-0 right-0 top-1/2 h-[1px] bg-white/[0.04] hidden md:block" />
+        </div>
+
+        {/* Interactive inspection hotspot on the 3D ball matching reference design */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 pointer-events-auto hidden md:flex items-center justify-center z-20 group cursor-pointer"
+          style={{ left: '63.5%' }}
+          onClick={() => {
+            playButtonClick('pop');
+            setIsTechModalOpen(true);
+          }}
+          title="Inspeccionar textura microgranulada"
+        >
+          <div className="relative flex items-center justify-center">
+            <div className="absolute w-8 h-8 rounded-full bg-white/20 animate-ping opacity-40 pointer-events-none" />
+            <div className="w-5 h-5 rounded-full bg-zinc-600/80 border border-white/40 shadow-lg backdrop-blur-md group-hover:scale-125 group-hover:bg-[#ff5722] group-hover:border-white transition-all flex items-center justify-center">
+              <span className="w-1.5 h-1.5 rounded-full bg-white block" />
+            </div>
+            {/* Micro Tooltip */}
+            <div className="absolute left-7 top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none bg-black/90 border border-zinc-700 px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-widest text-zinc-300 shadow-xl">
+              Inspeccionar Textura • 0.5mm
+            </div>
           </div>
-          <h2 className="font-display text-4xl sm:text-6xl font-bold mb-3 text-white uppercase leading-none">
-            Ingeniería
+        </div>
+
+        {/* Corner mark matching reference screenshot ("Ru") */}
+        <div className="absolute bottom-6 left-6 md:left-14 lg:left-20 pointer-events-none z-10">
+          <span className="text-zinc-600 font-mono text-xs font-semibold tracking-wider">Ru</span>
+        </div>
+
+        {/* Left-Aligned Editorial Content Container (max-w-[72%] on mobile ensures 3D ball remains in full clear view) */}
+        <div className="section-animate max-w-[72%] sm:max-w-md lg:max-w-xl w-full relative z-20 pointer-events-auto flex flex-col justify-center">
+          {/* Eyebrow with glowing accent dot */}
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <span
+              className="w-2 h-2 rounded-full transition-colors duration-300 shadow-[0_0_8px_rgba(255,87,34,0.6)]"
+              style={{ backgroundColor: currentEditionData.color }}
+            />
+            <span
+              className="text-[11px] sm:text-xs font-bold tracking-[0.22em] uppercase transition-colors duration-300"
+              style={{ color: currentEditionData.color }}
+            >
+              PERFORMANCE METRICS
+            </span>
+          </div>
+
+          {/* Giant high-impact headline matching reference image */}
+          <h2 className="font-headline text-6xl sm:text-7xl md:text-8xl lg:text-[7.2rem] font-black uppercase text-white tracking-tight leading-[0.88] mb-6 sm:mb-8 drop-shadow-md">
+            ELITE<br />CONTROL
           </h2>
-          <p className="text-zinc-300 text-sm mb-6 leading-relaxed">
-            Microtextura sensorial suave con canales ergonómicos de 0.8 mm diseñados para aliviar la tensión de la mano y potenciar el enfoque en tu escritorio.
-          </p>
 
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <div className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800">
-              <span className="block text-2xl font-black font-display text-white">{currentEditionData.specChannel}</span>
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Canales Ergo</span>
-            </div>
-            <div className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800">
-              <span className="block text-2xl font-black font-display text-emerald-400">100%</span>
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Anti-Fatiga</span>
-            </div>
+          {/* Subtitle Explorer Pills: Allows the user to playfully toggle metric subtitles */}
+          <div className="flex items-center gap-1 p-1 bg-zinc-900/80 border border-zinc-800/80 rounded-lg w-fit mb-6 sm:mb-7 backdrop-blur-sm">
+            <button
+              onClick={() => {
+                playButtonClick('subtle');
+                setMetricMode('grip');
+              }}
+              className={`px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold rounded transition-all cursor-pointer ${
+                metricMode === 'grip'
+                  ? 'bg-zinc-800 text-white shadow-sm'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              01 // Grip
+            </button>
+            <button
+              onClick={() => {
+                playButtonClick('subtle');
+                setMetricMode('ergo');
+              }}
+              className={`px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold rounded transition-all cursor-pointer ${
+                metricMode === 'ergo'
+                  ? 'bg-zinc-800 text-white shadow-sm'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              02 // Canales
+            </button>
+            <button
+              onClick={() => {
+                playButtonClick('subtle');
+                setMetricMode('core');
+              }}
+              className={`px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold rounded transition-all cursor-pointer ${
+                metricMode === 'core'
+                  ? 'bg-zinc-800 text-white shadow-sm'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              03 // Núcleo
+            </button>
           </div>
 
-          <button
-            id="tech-modal-btn"
-            onClick={() => {
-              playModalOpenSound();
-              setIsTechModalOpen(true);
-            }}
-            className="flex items-center gap-2 text-[#ff5722] font-bold text-xs uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
-          >
-            Ver Especificaciones <ArrowRight className="w-4 h-4" />
-          </button>
+          {/* Dynamic Metric Subtitles & Descriptions */}
+          <div className="space-y-6 sm:space-y-7 mb-8 transition-all duration-300">
+            {metricMode === 'grip' && (
+              <>
+                {/* Metric Block 1 (Direct match to reference image) */}
+                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
+                    100%
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                    MICROFIBER COMPOSITE
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                    Exclusive coating material providing superior grip management in all weather conditions.
+                  </p>
+                </div>
+
+                {/* Metric Block 2 (Direct match to reference image) */}
+                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none flex items-baseline">
+                    0.5<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-0.5">mm</span>
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                    PEBBLE DEPTH
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                    Optimized surface texture for precision handling and rotational feedback.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {metricMode === 'ergo' && (
+              <>
+                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none flex items-baseline">
+                    0.8<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-0.5">mm</span>
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                    ERGO RELIEF CHANNELS
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                    Canales ergonómicos de retorno táctil diseñados para aliviar la tensión palmar y fatiga en escritorio.
+                  </p>
+                </div>
+
+                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
+                    90/10
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                    TACTILE DENSITY RATIO
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                    Relación calibrada entre elasticidad exterior y absorción interna de micro-impactos.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {metricMode === 'core' && (
+              <>
+                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
+                    50.000+
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                    SOFT-SQUEEZE™ CYCLES
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                    Núcleo viscoelástico de memoria activa que absorbe el estrés diario sin deformación permanente.
+                  </p>
+                </div>
+
+                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none flex items-baseline">
+                    0.2<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-0.5">s</span>
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                    INSTANT REBOUND
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                    Respuesta elástica inmediata para un feedback táctil continuo que estimula la concentración.
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Action to view full tech specifications */}
+          <div className="flex items-center gap-4">
+            <button
+              id="tech-modal-btn"
+              onClick={() => {
+                playModalOpenSound();
+                setIsTechModalOpen(true);
+              }}
+              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-300 hover:text-white transition-colors cursor-pointer py-1 group"
+            >
+              <span>Ver Especificaciones Técnicas</span>
+              <ArrowRight className="w-4 h-4 text-[#ff5722] group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
         </div>
       </section>
 
-      {/* Section 2: RENDIMIENTO */}
-      <section id="rendimiento" className="min-h-screen w-full flex items-center justify-end px-6 md:px-16 lg:px-24 py-20 relative">
-        <div className="section-animate max-w-md w-full text-right bg-zinc-950/85 p-6 sm:p-8 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl relative z-10 pointer-events-auto">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#f59e0b] bg-[#f59e0b]/10 mb-3 justify-end">
-            <Sparkles className="w-3 h-3" /> Soft-Squeeze™ Core
-          </div>
-          <h2 className="font-display text-4xl sm:text-6xl font-bold mb-3 text-white uppercase leading-none">
-            Alivio & Enfoque
-          </h2>
-          <p className="text-zinc-300 text-sm mb-6 leading-relaxed">
-            Núcleo viscoelástico de alta resistencia que absorbe el estrés diario, previene la fatiga articular y recupera su forma esférica perfecta.
-          </p>
+      {/* Section 2: RENDIMIENTO (Harmonized architectural layout) */}
+      <section id="rendimiento" className="min-h-screen w-full flex items-center justify-end px-6 md:px-14 lg:px-20 py-24 relative overflow-hidden select-none">
+        {/* Subtle architectural CAD/Blueprint grid lines */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute left-[33%] top-0 bottom-0 w-[1px] bg-white/[0.04] hidden md:block" />
+          <div className="absolute left-[66%] top-0 bottom-0 w-[1px] bg-white/[0.04] hidden md:block" />
+          <div className="absolute left-0 right-0 top-1/2 h-[1px] bg-white/[0.04] hidden md:block" />
+        </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-6 text-left">
-            <div className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800">
-              <span className="block text-2xl font-black font-display text-[#ff5722]">{currentEditionData.bounceRate}</span>
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Recuperación</span>
+        {/* Right-Aligned Editorial Content Container */}
+        <div className="section-animate max-w-[85%] sm:max-w-md lg:max-w-xl w-full text-right relative z-20 pointer-events-auto flex flex-col items-end justify-center">
+          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
+            <span
+              className="w-2 h-2 rounded-full transition-colors duration-300 shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+              style={{ backgroundColor: currentEditionData.color }}
+            />
+            <span
+              className="text-[11px] sm:text-xs font-bold tracking-[0.22em] uppercase transition-colors duration-300"
+              style={{ color: currentEditionData.color }}
+            >
+              DYNAMIC RECOVERY
+            </span>
+          </div>
+
+          <h2 className="font-headline text-6xl sm:text-7xl md:text-8xl lg:text-[7.2rem] font-black uppercase text-white tracking-tight leading-[0.88] mb-8 sm:mb-10 drop-shadow-md">
+            ACTIVE<br />RESPONSE
+          </h2>
+
+          <div className="space-y-6 sm:space-y-7 mb-8 text-right w-full flex flex-col items-end">
+            <div className="border-r-2 border-zinc-700/80 hover:border-white transition-colors pr-4 sm:pr-6 space-y-1 group">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
+                50.000+
+              </div>
+              <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                COMPRESSION CYCLES
+              </div>
+              <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                Núcleo viscoelástico de memoria activa que absorbe el estrés diario y recupera su esfericidad al 100%.
+              </p>
             </div>
-            <div className="p-3 bg-zinc-900/90 rounded-xl border border-zinc-800">
-              <span className="block text-2xl font-black font-display text-white">50.000+</span>
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Compresiones</span>
+
+            <div className="border-r-2 border-zinc-700/80 hover:border-white transition-colors pr-4 sm:pr-6 space-y-1 group">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
+                0.2<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-0.5">s</span>
+              </div>
+              <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                REBOUND RESPONSE
+              </div>
+              <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                Retorno inmediato tras cada pulsación ergonómica para mantener el ritmo de trabajo sin interrupciones.
+              </p>
             </div>
           </div>
 
@@ -818,9 +1020,10 @@ export function Overlay({
             onClick={() => {
               handleOpenBuyFlow(edition);
             }}
-            className="flex items-center gap-2 text-[#ff5722] font-bold text-xs uppercase tracking-wider hover:text-white transition-colors cursor-pointer justify-end w-full"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-300 hover:text-white transition-colors cursor-pointer py-1 group"
           >
-            Comprar {currentEditionData.name} por WhatsApp <ArrowRight className="w-4 h-4" />
+            <span>Pedir {currentEditionData.name} por WhatsApp</span>
+            <ArrowRight className="w-4 h-4 text-[#ff5722] group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </section>
@@ -832,7 +1035,7 @@ export function Overlay({
             LIBERA EL ESTRÉS
           </h2>
           <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto">
-            Pelotita anti-estrés desarrollada por Arai para jóvenes emprendedores, con despacho express directo a tu puerta y atención por WhatsApp.
+            Pelotita anti-estrés desarrollada por Arai para jóvenes emprendedores, con delivery incluido
           </p>
 
           <button
