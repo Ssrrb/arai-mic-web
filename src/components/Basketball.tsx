@@ -1,6 +1,6 @@
 import { useRef, forwardRef, useImperativeHandle } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh, Group } from 'three';
+import { Mesh, Group, MathUtils } from 'three';
 import { Sphere } from '@react-three/drei';
 import { getBasketballTextures, getCustomBasketballTextures } from '../utils/basketballTextures';
 import { CustomBallConfig } from '../types';
@@ -21,6 +21,7 @@ export const Basketball = forwardRef<Group, BasketballProps>(function Basketball
 ) {
   const groupRef = useRef<Group>(null);
   const meshRef = useRef<Mesh>(null);
+  const currentSpeedRef = useRef(autoRotate ? 0.3 : 0);
 
   useImperativeHandle(ref, () => groupRef.current as Group);
 
@@ -29,10 +30,19 @@ export const Basketball = forwardRef<Group, BasketballProps>(function Basketball
     ? getCustomBasketballTextures(customConfig)
     : getBasketballTextures(edition);
 
-  useFrame((state) => {
-    if (autoRotate && groupRef.current) {
-      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.25;
-      groupRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.4) * 0.15;
+  // Smoothly damp/resume rotation so it never jumps or jerks on pause/resume
+  const targetSpeed = autoRotate ? 0.3 : 0;
+
+  useFrame((_, delta) => {
+    currentSpeedRef.current = MathUtils.lerp(
+      currentSpeedRef.current,
+      targetSpeed,
+      Math.min(1, delta * 3.5)
+    );
+
+    if (groupRef.current && currentSpeedRef.current > 0.0001) {
+      groupRef.current.rotation.y += delta * currentSpeedRef.current;
+      groupRef.current.rotation.x = Math.sin(Date.now() * 0.0012) * 0.12 * (currentSpeedRef.current / 0.3);
     }
   });
 

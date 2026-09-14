@@ -6,6 +6,7 @@ interface BackgroundTypographyProps {
   bgLeft?: string;
   bgRight?: string;
   isCustomizer?: boolean;
+  accentColor?: string;
 }
 
 export function BackgroundTypography({
@@ -13,6 +14,7 @@ export function BackgroundTypography({
   bgLeft,
   bgRight,
   isCustomizer = false,
+  accentColor,
 }: BackgroundTypographyProps) {
   const [scrollY, setScrollY] = useState(0);
 
@@ -61,37 +63,45 @@ export function BackgroundTypography({
       }}
       aria-hidden="true"
     >
-      {/* Desktop & Tablet Layout: Ball occupies the center with flanking typographic wings */}
-      <div className="hidden md:flex w-full items-center justify-center px-4 md:px-8 overflow-hidden">
+      {/* Desktop & Tablet Layout: Ball occupies the center with tightly framing typographic wings */}
+      <div className="hidden md:flex w-full items-center justify-center px-4 md:px-6 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={modelName}
-            initial={{ opacity: 0, scale: 0.96, y: 10 }}
+            initial={{ opacity: 0, scale: 0.97, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 1.04, y: -10 }}
-            transition={{ duration: 0.32, ease: 'easeOut' }}
+            exit={{ opacity: 0, scale: 1.03, y: -8 }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
             className="w-full max-w-full flex items-center justify-center relative"
           >
-            {/* Left Word Wing */}
-            <div className="flex-1 flex justify-end items-center overflow-hidden min-w-0 pr-2 lg:pr-4">
+            {/* Left Word Wing - Snugly frames the ball with zero obstruction */}
+            <div className="flex-1 flex justify-end items-center min-w-0 pr-2 md:pr-3 lg:pr-4 relative">
               <span
-                className="font-headline font-black text-[#484d56] tracking-tight uppercase leading-none select-none text-[clamp(4.5rem,14.5vw,14.5rem)] text-right whitespace-nowrap"
+                className="font-headline tracking-normal uppercase leading-none select-none text-[clamp(4.5rem,min(13.5vw,40vh),15rem)] lg:text-[clamp(6rem,min(14.5vw,45vh),18rem)] text-right whitespace-nowrap text-[#636875] transition-colors duration-300"
                 style={{ textRendering: 'geometricPrecision' }}
               >
                 {displayLeft}
               </span>
+
+              {/* Signature decorative accent dot anchored to the left wing baseline as in the reference */}
+              <div
+                className="hidden lg:block absolute bottom-2 right-12 w-3.5 h-3.5 rounded-full bg-[#555a66] transition-colors duration-300"
+                style={{
+                  backgroundColor: accentColor ? `${accentColor}99` : '#555a66',
+                }}
+              />
             </div>
 
-            {/* Central Space Reserved for the 3D Basketball Model */}
-            <div className="shrink-0 w-[clamp(180px,26vw,340px)] h-4 pointer-events-none relative flex items-center justify-center">
-              {/* Subtle accent dot next to the ball as seen in the reference */}
-              <div className="absolute -top-14 -right-2 lg:-right-4 w-3.5 h-3.5 rounded-full bg-[#525763] opacity-80" />
-            </div>
+            {/* Central Space Reserved for the 3D Basketball Model - Mathematically matched to the 3D sphere diameter */}
+            {/* 3D Ball diameter = 57.9vh on desktop, 47.1vh on tablet. Spacer provides exact 16-20px breath of space */}
+            <div
+              className="shrink-0 h-4 pointer-events-none relative flex items-center justify-center w-[clamp(280px,calc(47.1vh+10px),440px)] lg:w-[clamp(360px,calc(57.9vh+16px),640px)]"
+            />
 
             {/* Right Word Wing */}
-            <div className="flex-1 flex justify-start items-center overflow-hidden min-w-0 pl-2 lg:pl-4">
+            <div className="flex-1 flex justify-start items-center min-w-0 pl-2 md:pl-3 lg:pl-4 relative">
               <span
-                className="font-headline font-black text-[#484d56] tracking-tight uppercase leading-none select-none text-[clamp(4.5rem,14.5vw,14.5rem)] text-left whitespace-nowrap"
+                className="font-headline tracking-normal uppercase leading-none select-none text-[clamp(4.5rem,min(13.5vw,40vh),15rem)] lg:text-[clamp(6rem,min(14.5vw,45vh),18rem)] text-left whitespace-nowrap text-[#636875] transition-colors duration-300"
                 style={{ textRendering: 'geometricPrecision' }}
               >
                 {displayRight}
@@ -102,22 +112,21 @@ export function BackgroundTypography({
       </div>
 
       {/* Mobile Layout: Centered readable typography positioned right below the raised 3D ball */}
-      {/* Since the ball model on mobile is placed at y: 0.98 (~top 26%), this text is completely unblocked! */}
-      <div className="md:hidden flex items-center justify-center w-full px-6 overflow-hidden mt-12 sm:mt-16">
+      <div className="md:hidden flex items-center justify-center w-full px-6 overflow-hidden mt-14 sm:mt-18">
         <AnimatePresence mode="wait">
           <motion.div
             key={`mobile-${modelName}`}
-            initial={{ opacity: 0, scale: 0.94, y: 12 }}
+            initial={{ opacity: 0, scale: 0.94, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 1.06, y: -12 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            exit={{ opacity: 0, scale: 1.06, y: -10 }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
             className="flex items-center justify-center tracking-tight"
           >
             <span
-              className="font-headline font-black text-[#484d56] tracking-tight uppercase leading-none select-none text-[clamp(3.8rem,17vw,5.6rem)] text-center whitespace-nowrap"
+              className="font-headline uppercase leading-none select-none text-[clamp(4.2rem,18vw,6.5rem)] text-center whitespace-nowrap text-[#636875]"
               style={{ textRendering: 'geometricPrecision' }}
             >
-              {displayLeft} {displayRight}
+              {modelName}
             </span>
           </motion.div>
         </AnimatePresence>

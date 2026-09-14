@@ -12,6 +12,7 @@ import { CartSwishEffects } from './components/CartSwishEffects';
 import { CartDrawer } from './components/CartDrawer';
 import { WhatsAppCheckoutModal } from './components/WhatsAppCheckoutModal';
 import { BallEdition } from './components/Basketball';
+import { ViewportFrame } from './components/ViewportFrame';
 import { EDITIONS_LIST } from './data/editions';
 import { CustomBallConfig, AppView, CartItem } from './types';
 import {
@@ -48,6 +49,55 @@ export default function App() {
   const [isShooting, setIsShooting] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
 
+  // Global event listener to control autoRotate from anywhere in the app
+  useEffect(() => {
+    const handleAutoRotateEvent = (e: Event) => {
+      const customEvent = e as CustomEvent<{
+        autoRotate?: boolean;
+        enabled?: boolean;
+        paused?: boolean;
+      }>;
+      if (customEvent.detail) {
+        if (typeof customEvent.detail.autoRotate === 'boolean') {
+          setAutoRotate(customEvent.detail.autoRotate);
+          return;
+        }
+        if (typeof customEvent.detail.enabled === 'boolean') {
+          setAutoRotate(customEvent.detail.enabled);
+          return;
+        }
+        if (typeof customEvent.detail.paused === 'boolean') {
+          setAutoRotate(!customEvent.detail.paused);
+          return;
+        }
+      }
+      setAutoRotate((prev) => !prev);
+    };
+
+    window.addEventListener('tuku:set-auto-rotate', handleAutoRotateEvent);
+    window.addEventListener('tuku:toggle-auto-rotate', handleAutoRotateEvent);
+    window.addEventListener('tuku:auto-rotate', handleAutoRotateEvent);
+    window.addEventListener('tuku-set-auto-rotate', handleAutoRotateEvent);
+    window.addEventListener('tuku-auto-rotate', handleAutoRotateEvent);
+
+    return () => {
+      window.removeEventListener('tuku:set-auto-rotate', handleAutoRotateEvent);
+      window.removeEventListener('tuku:toggle-auto-rotate', handleAutoRotateEvent);
+      window.removeEventListener('tuku:auto-rotate', handleAutoRotateEvent);
+      window.removeEventListener('tuku-set-auto-rotate', handleAutoRotateEvent);
+      window.removeEventListener('tuku-auto-rotate', handleAutoRotateEvent);
+    };
+  }, []);
+
+  // Pause autoRotate during view transitions and resume smoothly once transition completes
+  useEffect(() => {
+    setAutoRotate(false);
+    const resumeTimer = setTimeout(() => {
+      setAutoRotate(true);
+    }, 750);
+    return () => clearTimeout(resumeTimer);
+  }, [view]);
+
   const currentEditionData =
     EDITIONS_LIST.find((e) => e.id === edition) || EDITIONS_LIST[0];
 
@@ -58,12 +108,14 @@ export default function App() {
 
   const handleOpenCustomizer = useCallback(() => {
     playButtonClick();
+    setAutoRotate(false);
     setView('customizer');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const handleBackToLanding = useCallback(() => {
     playButtonClick();
+    setAutoRotate(false);
     setView('landing');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
@@ -198,24 +250,31 @@ export default function App() {
     window.dispatchEvent(new CustomEvent('tuku-reset-rotation'));
   }, []);
 
-  // Ambient backdrop color
-  const ambientBackground =
+  // Determine dynamic primary color from current ball model or customizer
+  const primaryColor =
     view === 'customizer'
-      ? '#09090b'
-      : AMBIENT_BG[edition] || '#031d2c';
+      ? customConfig.baseColor || '#ff5722'
+      : currentEditionData.color || '#ff5722';
 
   return (
     <div
-      className="w-full min-h-screen md:p-3 lg:p-5 flex items-center justify-center transition-colors duration-700 font-sans"
-      style={{ backgroundColor: ambientBackground }}
+      className="w-full min-h-screen relative font-sans select-none overflow-x-hidden bg-black"
+      style={{
+        backgroundColor: primaryColor,
+        transition: 'background-color 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+      }}
     >
-      <main className="w-full max-w-[1780px] min-h-screen md:min-h-[96vh] bg-black md:rounded-[28px] text-white relative overflow-hidden border border-white/5 shadow-2xl">
+      {/* High-precision outer margin / frame matching the reference editorial design */}
+      <ViewportFrame color={primaryColor} />
+
+      <main className="w-full min-h-screen bg-black text-white relative overflow-hidden">
         {/* Background typography behind the 3D ball */}
         <BackgroundTypography
           modelName={view === 'customizer' ? 'CUSTOM' : currentEditionData.bgText}
           bgLeft={view === 'customizer' ? '35.000 GS' : currentEditionData.bgLeft}
           bgRight={view === 'customizer' ? 'ERGO' : currentEditionData.bgRight}
           isCustomizer={view === 'customizer'}
+          accentColor={primaryColor}
         />
 
         {/* 3D Basketball canvas (interactive WebGL layer with real-time color & texture updates) */}

@@ -340,14 +340,29 @@ export function Overlay({
     <div ref={containerRef} className="relative z-20 w-full no-scrollbar">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 bg-zinc-900/95 border border-[#ff5722]/60 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold animate-in fade-in slide-in-from-top-4 duration-200 backdrop-blur-md">
+        <div
+          className="fixed z-50 flex items-center gap-2.5 bg-zinc-900/95 border border-[#ff5722]/60 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold animate-in fade-in slide-in-from-top-4 duration-200 backdrop-blur-md"
+          style={{
+            top: 'calc(var(--frame-margin, 28px) + 4.5rem)',
+            right: 'calc(var(--frame-margin, 28px) + 1.5rem)',
+          }}
+        >
           <Check className="w-4 h-4 text-[#ff5722]" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Header - Expert UI/Front-End Implementation */}
-      <header className="fixed top-0 left-0 w-full px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center z-40 backdrop-blur-xl bg-zinc-950/75 border-b border-white/[0.08] text-white transition-all duration-300">
+      {/* Header - Positioned cleanly inside the outer frame margin with rounded top corners */}
+      <header
+        className="fixed z-40 backdrop-blur-xl bg-zinc-950/75 border-b border-white/[0.08] text-white transition-all duration-300 px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center"
+        style={{
+          top: 'var(--frame-margin, 28px)',
+          left: 'var(--frame-margin, 28px)',
+          right: 'var(--frame-margin, 28px)',
+          borderTopLeftRadius: 'var(--frame-radius, 36px)',
+          borderTopRightRadius: 'var(--frame-radius, 36px)',
+        }}
+      >
         {/* Brand Logo with TUKU icon */}
         <button
           id="brand-logo-btn"
@@ -450,7 +465,14 @@ export function Overlay({
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="fixed top-[68px] sm:top-[74px] left-0 w-full bg-zinc-950/95 border-b border-white/10 p-6 flex flex-col gap-3.5 z-30 md:hidden backdrop-blur-2xl shadow-2xl animate-in slide-in-from-top-2 duration-200">
+        <div
+          className="fixed bg-zinc-950/95 border-b border-white/10 p-6 flex flex-col gap-3.5 z-30 md:hidden backdrop-blur-2xl shadow-2xl animate-in slide-in-from-top-2 duration-200"
+          style={{
+            top: 'calc(var(--frame-margin, 14px) + 60px)',
+            left: 'var(--frame-margin, 14px)',
+            right: 'var(--frame-margin, 14px)',
+          }}
+        >
           <a
             href="#ingenieria"
             onClick={() => setMobileMenuOpen(false)}
@@ -484,7 +506,16 @@ export function Overlay({
       )}
 
       {/* Hero Section - Matching the Reference Design with Adaptive Responsiveness */}
-      <section className="min-h-[100dvh] w-full relative flex flex-col justify-between px-4 sm:px-8 md:px-12 pt-24 sm:pt-28 pb-6 sm:pb-8">
+      <section
+        id="hero"
+        className="min-h-[100dvh] w-full relative flex flex-col justify-between"
+        style={{
+          paddingTop: 'calc(var(--frame-margin, 28px) + 5.5rem)',
+          paddingBottom: 'calc(var(--frame-margin, 28px) + 1.5rem)',
+          paddingLeft: 'calc(var(--frame-margin, 28px) + 1.25rem)',
+          paddingRight: 'calc(var(--frame-margin, 28px) + 1.25rem)',
+        }}
+      >
         {/* Top-Left: Promotion Video Button */}
         <div className="w-full flex justify-between items-start">
           <div className="pointer-events-auto flex items-center gap-2.5 sm:gap-3">
@@ -506,7 +537,10 @@ export function Overlay({
         </div>
 
         {/* Mobile Vertically Stacked Navigation Arrows adjacent to the centered typography */}
-        <div className="md:hidden pointer-events-auto absolute right-4 top-[48%] -translate-y-1/2 flex flex-col gap-2.5 z-30">
+        <div
+          className="md:hidden pointer-events-auto absolute top-[48%] -translate-y-1/2 flex flex-col gap-2.5 z-30"
+          style={{ right: 'calc(var(--frame-margin, 14px) + 0.75rem)' }}
+        >
           <button
             id="mobile-prev-edition-btn"
             onClick={handlePrevEdition}
@@ -700,7 +734,10 @@ export function Overlay({
       </section>
 
       {/* Right Vertical Rail Indicator (as seen in the reference screenshot) */}
-      <div className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 hidden md:flex flex-col items-center gap-3 pointer-events-none z-20">
+      <div
+        className="fixed top-1/2 -translate-y-1/2 hidden md:flex flex-col items-center gap-3 pointer-events-none z-20"
+        style={{ right: 'calc(var(--frame-margin, 28px) + 1rem)' }}
+      >
         <div className="w-[1px] h-14 bg-zinc-800 relative">
           <div
             className="w-[2px] h-5 absolute top-1 -left-[0.5px] transition-colors duration-300"
@@ -716,8 +753,8 @@ export function Overlay({
       </div>
 
       {/* Section 1: INGENIERÍA */}
-      <section id="ingenieria" className="min-h-screen w-full flex items-center justify-start px-6 md:px-24 py-20">
-        <div className="section-animate max-w-md bg-zinc-950/80 p-6 sm:p-8 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl">
+      <section id="ingenieria" className="min-h-screen w-full flex items-center justify-start px-6 md:px-16 lg:px-24 py-20 relative">
+        <div className="section-animate max-w-md w-full bg-zinc-950/85 p-6 sm:p-8 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl relative z-10 pointer-events-auto">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#ff5722] bg-[#ff5722]/10 mb-3">
             <Zap className="w-3 h-3" /> Ergonomía Táctil
           </div>
@@ -753,8 +790,8 @@ export function Overlay({
       </section>
 
       {/* Section 2: RENDIMIENTO */}
-      <section id="rendimiento" className="min-h-screen w-full flex items-center justify-end px-6 md:px-24 py-20">
-        <div className="section-animate max-w-md text-right bg-zinc-950/80 p-6 sm:p-8 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl">
+      <section id="rendimiento" className="min-h-screen w-full flex items-center justify-end px-6 md:px-16 lg:px-24 py-20 relative">
+        <div className="section-animate max-w-md w-full text-right bg-zinc-950/85 p-6 sm:p-8 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl relative z-10 pointer-events-auto">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#f59e0b] bg-[#f59e0b]/10 mb-3 justify-end">
             <Sparkles className="w-3 h-3" /> Soft-Squeeze™ Core
           </div>

@@ -31,8 +31,8 @@ interface WhatsAppCheckoutModalProps {
 }
 
 // Configurable store WhatsApp number
-export const STORE_WHATSAPP_NUMBER = '595981885885'; // Formato internacional
-export const STORE_WHATSAPP_DISPLAY = '+595 981 885 885';
+export const STORE_WHATSAPP_NUMBER = '595982170907'; // Formato internacional
+export const STORE_WHATSAPP_DISPLAY = '+595212381737';
 
 export function WhatsAppCheckoutModal({
   isOpen,

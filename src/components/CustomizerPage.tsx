@@ -196,7 +196,16 @@ export function CustomizerPage({
   return (
     <div className="relative z-30 w-full min-h-screen text-white flex flex-col pointer-events-none">
       {/* Shared storefront header, adapted for the TUKU Lab workspace */}
-      <header className="fixed top-0 left-0 w-full px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center z-40 backdrop-blur-xl bg-zinc-950/75 border-b border-white/[0.08] text-white transition-all duration-300 pointer-events-auto">
+      <header
+        className="fixed z-40 backdrop-blur-xl bg-zinc-950/75 border-b border-white/[0.08] text-white transition-all duration-300 pointer-events-auto px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center"
+        style={{
+          top: 'var(--frame-margin, 28px)',
+          left: 'var(--frame-margin, 28px)',
+          right: 'var(--frame-margin, 28px)',
+          borderTopLeftRadius: 'var(--frame-radius, 36px)',
+          borderTopRightRadius: 'var(--frame-radius, 36px)',
+        }}
+      >
         <button
           id="customizer-brand-btn"
           onClick={() => {
@@ -252,10 +261,18 @@ export function CustomizerPage({
       </header>
 
       {/* Main Layout Container */}
-      <div className="w-full flex-1 pt-16 pb-28 md:pb-6 flex flex-col md:flex-row justify-between items-start">
+      <div
+        className="w-full flex-1 flex flex-col md:flex-row justify-between items-start"
+        style={{
+          paddingTop: 'calc(var(--frame-margin, 28px) + 4.5rem)',
+          paddingBottom: 'calc(var(--frame-margin, 28px) + 1.5rem)',
+          paddingLeft: 'var(--frame-margin, 28px)',
+          paddingRight: 'var(--frame-margin, 28px)',
+        }}
+      >
         {/* Left Customization Control Panel - Exactly styled like the user reference screenshot */}
         <aside
-          className="w-full md:w-[460px] lg:w-[490px] xl:w-[510px] pointer-events-none md:pointer-events-auto bg-transparent md:bg-black/80 md:backdrop-blur-2xl md:p-8 md:min-h-[calc(100vh-4rem)] flex flex-col justify-between md:border-r border-white/[0.08] md:shadow-2xl relative z-30"
+          className="w-full md:w-[460px] lg:w-[490px] xl:w-[510px] pointer-events-none md:pointer-events-auto bg-transparent md:bg-black/80 md:backdrop-blur-2xl md:p-8 md:min-h-[calc(100vh-var(--frame-margin,28px)*2-4.5rem)] flex flex-col justify-between md:border-r border-white/[0.08] md:shadow-2xl relative z-30"
           style={{ willChange: 'transform' }}
         >
           {/* On mobile, reserve a clear viewport for the 3D ball before the controls. */}

@@ -3,10 +3,36 @@
 @theme {
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-display: 'Teko', sans-serif;
-  --font-headline: 'Anton', 'Bebas Neue', sans-serif;
+  --font-headline: 'Bebas Neue', 'Anton', sans-serif;
   --color-brand-orange: #ff5722;
   --color-brand-gold: #f59e0b;
   --color-brand-dark: #09090b;
+}
+
+:root {
+  --frame-margin: 14px;
+  --frame-radius: 24px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --frame-margin: 20px;
+    --frame-radius: 30px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --frame-margin: 28px;
+    --frame-radius: 36px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --frame-margin: 32px;
+    --frame-radius: 40px;
+  }
 }
 
 body {

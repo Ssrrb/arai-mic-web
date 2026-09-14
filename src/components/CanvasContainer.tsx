@@ -46,6 +46,7 @@ function SceneController({
   const prevPointerRef = useRef({ x: 0, y: 0 });
   const rotVelocityRef = useRef({ x: 0, y: 0 });
   const userRotRef = useRef({ x: 0.1, y: 0.35 });
+  const autoRotSpeedRef = useRef(autoRotate ? 0.45 : 0);
 
   const { size, camera } = useThree();
 
@@ -83,8 +84,13 @@ function SceneController({
         rotVelocityRef.current.x *= 0.92;
         rotVelocityRef.current.y *= 0.92;
 
-        if (autoRotate) {
-          userRotRef.current.y += delta * 0.45;
+        autoRotSpeedRef.current = THREE.MathUtils.lerp(
+          autoRotSpeedRef.current,
+          autoRotate ? 0.45 : 0,
+          Math.min(1, delta * 3.5)
+        );
+        if (autoRotSpeedRef.current > 0.0001) {
+          userRotRef.current.y += delta * autoRotSpeedRef.current;
         }
       }
 
@@ -277,42 +283,76 @@ function SceneController({
         },
       });
 
-      const xOffset = isMobile ? 0.75 : isTablet ? 1.4 : 2.2;
-      const zOffset = isMobile ? 0.9 : 1.8;
+      const rightX = isMobile ? 0.95 : isTablet ? 1.6 : 2.5;
+      const leftX = isMobile ? -0.95 : isTablet ? -1.6 : -2.5;
+      const ballZ = isMobile ? 0.35 : 0.45;
 
+      // 1. Smoothly move to the RIGHT as the user scrolls out of Hero into Ingeniería
       tl.fromTo(
         groupRef.current!.position,
         { x: 0, y: landingInitialY, z: 0 },
         {
-          x: xOffset,
-          y: isMobile ? -0.35 : -0.8,
-          z: zOffset,
-          duration: 1,
+          x: rightX,
+          y: isMobile ? -0.2 : -0.25,
+          z: ballZ,
+          duration: 1.2,
+          ease: 'power1.inOut',
         }
       )
+        // 2. HOLD firmly on the RIGHT throughout the entire Ingeniería section so the text on the left is completely unobstructed!
         .to(groupRef.current!.position, {
-          x: -xOffset,
-          y: isMobile ? 0.35 : 0.6,
-          z: zOffset * 0.75,
-          duration: 1,
+          x: rightX + 0.05,
+          y: isMobile ? -0.25 : -0.3,
+          z: ballZ,
+          duration: 1.6,
+          ease: 'none',
         })
+        // 3. Move from RIGHT to LEFT towards the Rendimiento section (where text is on the right)
         .to(groupRef.current!.position, {
-          x: xOffset * 0.75,
-          y: isMobile ? -0.2 : -0.4,
-          z: zOffset * 0.85,
-          duration: 1,
+          x: leftX,
+          y: isMobile ? 0.2 : 0.25,
+          z: ballZ,
+          duration: 1.4,
+          ease: 'power1.inOut',
         })
+        // 4. HOLD on the LEFT throughout the Rendimiento section
+        .to(groupRef.current!.position, {
+          x: leftX - 0.05,
+          y: isMobile ? 0.25 : 0.3,
+          z: ballZ,
+          duration: 1.4,
+          ease: 'none',
+        })
+        // 5. Center the ball for the final CTA section
         .to(groupRef.current!.position, {
           x: 0,
-          y: isMobile ? 0.05 : 0.1,
-          z: isMobile ? 1.2 : 2.2,
-          duration: 1,
+          y: isMobile ? 0.05 : 0.05,
+          z: isMobile ? 0.8 : 1.2,
+          duration: 1.0,
+          ease: 'power1.out',
         });
 
-      tl.to(groupRef.current!.rotation, { x: Math.PI * 0.8, y: Math.PI * 2.2, duration: 1 }, 0)
-        .to(groupRef.current!.rotation, { x: Math.PI * 1.8, y: Math.PI * 4.4, duration: 1 }, 1)
-        .to(groupRef.current!.rotation, { x: Math.PI * 2.6, y: Math.PI * 6.2, duration: 1 }, 2)
-        .to(groupRef.current!.rotation, { x: Math.PI * 3.4, y: Math.PI * 8.0, duration: 1 }, 3);
+      // Synchronize overall rotation across the full scroll timeline (total duration = 6.6)
+      tl.to(
+        groupRef.current!.rotation,
+        { x: Math.PI * 0.8, y: Math.PI * 2.2, duration: 1.8, ease: 'none' },
+        0
+      )
+        .to(
+          groupRef.current!.rotation,
+          { x: Math.PI * 1.6, y: Math.PI * 4.4, duration: 1.8, ease: 'none' },
+          1.8
+        )
+        .to(
+          groupRef.current!.rotation,
+          { x: Math.PI * 2.4, y: Math.PI * 6.6, duration: 1.6, ease: 'none' },
+          3.6
+        )
+        .to(
+          groupRef.current!.rotation,
+          { x: Math.PI * 3.2, y: Math.PI * 8.8, duration: 1.4, ease: 'none' },
+          5.2
+        );
     });
 
     return () => ctx.revert();
@@ -395,7 +435,7 @@ function SceneController({
                   edition={edition}
                   customConfig={viewMode === 'customizer' ? customConfig : undefined}
                   scale={responsiveScale}
-                  autoRotate={viewMode === 'landing'}
+                  autoRotate={viewMode === 'landing' && autoRotate}
                 />
               </group>
             </group>
