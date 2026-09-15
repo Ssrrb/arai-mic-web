@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface BackgroundTypographyProps {
@@ -16,16 +16,41 @@ export function BackgroundTypography({
   isCustomizer = false,
   accentColor,
 }: BackgroundTypographyProps) {
-  const [scrollY, setScrollY] = useState(0);
+  const layerRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
 
+  // Drive the fade/parallax imperatively via rAF instead of React state. Updating
+  // state on every scroll event re-rendered this whole fixed layer each frame and
+  // restarted its opacity transition, which read as a blink/lag mid-scroll.
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
+    if (isCustomizer) return;
+
+    const update = () => {
+      rafRef.current = null;
+      const el = layerRef.current;
+      if (!el) return;
+      const y = window.scrollY;
+      const opacity = Math.max(0, 1 - y / 320);
+      el.style.opacity = `${opacity}`;
+      el.style.transform = `translateY(-${y * 0.22}px)`;
+      el.style.visibility = opacity <= 0.01 ? 'hidden' : 'visible';
     };
 
+    const handleScroll = () => {
+      if (rafRef.current !== null) return;
+      rafRef.current = requestAnimationFrame(update);
+    };
+
+    update();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [isCustomizer]);
 
   if (isCustomizer) {
     return (
@@ -36,11 +61,8 @@ export function BackgroundTypography({
     );
   }
 
-  // Compute fade out and parallax effect based on scroll
-  const opacity = Math.max(0, 1 - scrollY / 320);
-  const translateY = scrollY * 0.22;
-
-  if (opacity <= 0.01) return null;
+  // Initial values mirror the rAF handler so a reload mid-page doesn't flash.
+  const initialScrollY = typeof window === 'undefined' ? 0 : window.scrollY;
 
   // Resolve left and right segments for short names (e.g. NEB / ULA, FUE / GO, O / RO, MET / AL)
   const displayLeft =
@@ -56,10 +78,12 @@ export function BackgroundTypography({
 
   return (
     <div
-      className="fixed inset-0 z-0 flex flex-col items-center justify-center pointer-events-none select-none overflow-hidden transition-opacity duration-150"
+      ref={layerRef}
+      className="fixed inset-0 z-0 flex flex-col items-center justify-center pointer-events-none select-none overflow-hidden"
       style={{
-        opacity,
-        transform: `translateY(-${translateY}px)`,
+        opacity: Math.max(0, 1 - initialScrollY / 320),
+        transform: `translateY(-${initialScrollY * 0.22}px)`,
+        willChange: 'transform, opacity',
       }}
       aria-hidden="true"
     >

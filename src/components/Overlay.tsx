@@ -75,21 +75,40 @@ export function Overlay({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  // Monitor active scroll section for intelligent, dynamic header navigation
+  // Monitor active scroll section for intelligent, dynamic header navigation.
+  // Cache the section offset and coalesce updates into a single rAF per frame so
+  // scrolling never triggers a forced layout (offsetTop) on every scroll event.
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPos = window.scrollY + 260;
-      const ingEl = document.getElementById('ingenieria');
+    let rafId: number | null = null;
+    let ingenieriaTop = Number.POSITIVE_INFINITY;
 
-      if (ingEl && scrollPos >= ingEl.offsetTop) {
-        setActiveSection('ingenieria');
-      } else {
-        setActiveSection(null);
-      }
+    const measure = () => {
+      const ingEl = document.getElementById('ingenieria');
+      ingenieriaTop = ingEl ? ingEl.offsetTop : Number.POSITIVE_INFINITY;
     };
 
+    const update = () => {
+      rafId = null;
+      const isIngenieria = window.scrollY + 260 >= ingenieriaTop;
+      setActiveSection((prev) => {
+        const next = isIngenieria ? 'ingenieria' : null;
+        return prev === next ? prev : next;
+      });
+    };
+
+    const handleScroll = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(update);
+    };
+
+    measure();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', measure);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Video modal state
@@ -354,7 +373,7 @@ export function Overlay({
 
       {/* Header - Positioned cleanly inside the outer frame margin with rounded top corners */}
       <header
-        className="fixed z-40 backdrop-blur-xl bg-zinc-950/75 border-b border-white/[0.08] text-white transition-all duration-300 px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center"
+        className="fixed z-40 backdrop-blur-md bg-zinc-950/85 border-b border-white/[0.08] text-white transition-all duration-300 px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center"
         style={{
           top: 'var(--frame-margin, 28px)',
           left: 'var(--frame-margin, 28px)',

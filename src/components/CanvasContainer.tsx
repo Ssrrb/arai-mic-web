@@ -499,7 +499,13 @@ export function CanvasContainer({
       <Canvas
         style={{ pointerEvents: 'none' }}
         camera={{ position: [0, 0, 6], fov: 45 }}
-        gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
+        dpr={[1, 1.5]}
+        gl={{
+          alpha: true,
+          antialias: true,
+          powerPreference: 'high-performance',
+          stencil: false,
+        }}
       >
         <ambientLight intensity={0.8} />
         <spotLight position={[8, 14, 8]} angle={0.28} penumbra={1} intensity={2.0} castShadow />
@@ -549,7 +555,8 @@ export function CanvasContainer({
             position={[0, -2.5, 0]}
             opacity={0.55}
             scale={20}
-            blur={2.4}
+            resolution={256}
+            blur={1.6}
             far={4.5}
             color={shadowColor}
           />

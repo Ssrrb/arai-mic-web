@@ -197,7 +197,7 @@ export function CustomizerPage({
     <div className="relative z-30 w-full min-h-screen text-white flex flex-col pointer-events-none">
       {/* Shared storefront header, adapted for the TUKU Lab workspace */}
       <header
-        className="fixed z-40 backdrop-blur-xl bg-zinc-950/75 border-b border-white/[0.08] text-white transition-all duration-300 pointer-events-auto px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center"
+        className="fixed z-40 backdrop-blur-md bg-zinc-950/85 border-b border-white/[0.08] text-white transition-all duration-300 pointer-events-auto px-5 sm:px-10 lg:px-14 py-3.5 sm:py-4 flex justify-between items-center"
         style={{
           top: 'var(--frame-margin, 28px)',
           left: 'var(--frame-margin, 28px)',
