@@ -803,145 +803,40 @@ export function Overlay({
               className="text-[11px] sm:text-xs font-bold tracking-[0.22em] uppercase transition-colors duration-300"
               style={{ color: currentEditionData.color }}
             >
-              PERFORMANCE METRICS
+              DISEÑADO PARA TUS MANOS
             </span>
           </div>
 
           {/* Giant high-impact headline matching reference image */}
           <h2 className="font-headline text-6xl sm:text-7xl md:text-8xl lg:text-[7.2rem] font-black uppercase text-white tracking-tight leading-[0.88] mb-6 sm:mb-8 drop-shadow-md">
-            ELITE<br />CONTROL
+            CALMA<br />TOTAL
           </h2>
 
-          {/* Subtitle Explorer Pills: Allows the user to playfully toggle metric subtitles */}
-          <div className="flex items-center gap-1 p-1 bg-zinc-900/80 border border-zinc-800/80 rounded-lg w-fit mb-6 sm:mb-7 backdrop-blur-sm">
-            <button
-              onClick={() => {
-                playButtonClick('subtle');
-                setMetricMode('grip');
-              }}
-              className={`px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold rounded transition-all cursor-pointer ${
-                metricMode === 'grip'
-                  ? 'bg-zinc-800 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              01 // Grip
-            </button>
-            <button
-              onClick={() => {
-                playButtonClick('subtle');
-                setMetricMode('ergo');
-              }}
-              className={`px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold rounded transition-all cursor-pointer ${
-                metricMode === 'ergo'
-                  ? 'bg-zinc-800 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              02 // Canales
-            </button>
-            <button
-              onClick={() => {
-                playButtonClick('subtle');
-                setMetricMode('core');
-              }}
-              className={`px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold rounded transition-all cursor-pointer ${
-                metricMode === 'core'
-                  ? 'bg-zinc-800 text-white shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              03 // Núcleo
-            </button>
-          </div>
+          {/* Metric blocks matching the reference editorial layout */}
+          <div className="space-y-6 sm:space-y-7 mb-8">
+            <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
+                100%
+              </div>
+              <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                SILICONA FLEXIBLE
+              </div>
+              <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                Textura suave que alivia la tensión sin marcar la piel.
+              </p>
+            </div>
 
-          {/* Dynamic Metric Subtitles & Descriptions */}
-          <div className="space-y-6 sm:space-y-7 mb-8 transition-all duration-300">
-            {metricMode === 'grip' && (
-              <>
-                {/* Metric Block 1 (Direct match to reference image) */}
-                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
-                    100%
-                  </div>
-                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
-                    MICROFIBER COMPOSITE
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
-                    Exclusive coating material providing superior grip management in all weather conditions.
-                  </p>
-                </div>
-
-                {/* Metric Block 2 (Direct match to reference image) */}
-                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none flex items-baseline">
-                    0.5<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-0.5">mm</span>
-                  </div>
-                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
-                    PEBBLE DEPTH
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
-                    Optimized surface texture for precision handling and rotational feedback.
-                  </p>
-                </div>
-              </>
-            )}
-
-            {metricMode === 'ergo' && (
-              <>
-                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none flex items-baseline">
-                    0.8<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-0.5">mm</span>
-                  </div>
-                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
-                    ERGO RELIEF CHANNELS
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
-                    Canales ergonómicos de retorno táctil diseñados para aliviar la tensión palmar y fatiga en escritorio.
-                  </p>
-                </div>
-
-                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
-                    90/10
-                  </div>
-                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
-                    TACTILE DENSITY RATIO
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
-                    Relación calibrada entre elasticidad exterior y absorción interna de micro-impactos.
-                  </p>
-                </div>
-              </>
-            )}
-
-            {metricMode === 'core' && (
-              <>
-                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">
-                    50.000+
-                  </div>
-                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
-                    SOFT-SQUEEZE™ CYCLES
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
-                    Núcleo viscoelástico de memoria activa que absorbe el estrés diario sin deformación permanente.
-                  </p>
-                </div>
-
-                <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group animate-in fade-in duration-200">
-                  <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none flex items-baseline">
-                    0.2<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-0.5">s</span>
-                  </div>
-                  <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
-                    INSTANT REBOUND
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
-                    Respuesta elástica inmediata para un feedback táctil continuo que estimula la concentración.
-                  </p>
-                </div>
-              </>
-            )}
+            <div className="border-l-2 border-zinc-700/80 hover:border-white transition-colors pl-4 sm:pl-6 space-y-1 group">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none flex items-baseline">
+                6<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-1">cm</span>
+              </div>
+              <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
+                TAMAÑO DE BOLSILLO
+              </div>
+              <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
+                Compacta y liviana, te acompaña a la oficina o la universidad.
+              </p>
+            </div>
           </div>
 
           {/* Action to view full tech specifications */}
@@ -981,12 +876,12 @@ export function Overlay({
               className="text-[11px] sm:text-xs font-bold tracking-[0.22em] uppercase transition-colors duration-300"
               style={{ color: currentEditionData.color }}
             >
-              DYNAMIC RECOVERY
+              RESPUESTA ACTIVA
             </span>
           </div>
 
           <h2 className="font-headline text-6xl sm:text-7xl md:text-8xl lg:text-[7.2rem] font-black uppercase text-white tracking-tight leading-[0.88] mb-8 sm:mb-10 drop-shadow-md">
-            ACTIVE<br />RESPONSE
+            RECUPERA<br />TU FOCO
           </h2>
 
           <div className="space-y-6 sm:space-y-7 mb-8 text-right w-full flex flex-col items-end">
@@ -995,10 +890,10 @@ export function Overlay({
                 50.000+
               </div>
               <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
-                COMPRESSION CYCLES
+                APRETONES
               </div>
               <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
-                Núcleo viscoelástico de memoria activa que absorbe el estrés diario y recupera su esfericidad al 100%.
+                Resiste el uso diario sin perder su forma ni suavidad.
               </p>
             </div>
 
@@ -1007,10 +902,10 @@ export function Overlay({
                 0.2<span className="text-xl sm:text-2xl font-normal text-zinc-400 ml-0.5">s</span>
               </div>
               <div className="text-xs sm:text-[13px] font-bold tracking-[0.18em] text-zinc-300 uppercase pt-1">
-                REBOUND RESPONSE
+                RETORNO
               </div>
               <p className="text-xs sm:text-[13px] text-zinc-400 leading-relaxed max-w-sm pt-0.5">
-                Retorno inmediato tras cada pulsación ergonómica para mantener el ritmo de trabajo sin interrupciones.
+                Vuelve a su forma al instante para seguir sin pausas.
               </p>
             </div>
           </div>

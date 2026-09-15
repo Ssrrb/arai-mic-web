@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { ShoppingBag, X, Plus, Minus, Trash2, Send, Sparkles } from 'lucide-react';
 import { CartItem } from '../types';
 import { BallEdition } from './Basketball';
@@ -42,7 +43,7 @@ export function CartDrawer({
   const currentEditionData =
     EDITIONS_LIST.find((e) => e.id === currentEdition) || EDITIONS_LIST[0];
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="w-full max-w-md bg-zinc-950 border-l border-zinc-800 h-full flex flex-col justify-between p-6 shadow-2xl overflow-y-auto">
         {/* Drawer Header */}
@@ -242,6 +243,7 @@ export function CartDrawer({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
